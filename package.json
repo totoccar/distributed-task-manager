@@ -1,0 +1,25 @@
+{
+    "name": "task-manager",
+    "version": "1.0.0",
+    "description": "Un proyecto full-stack de gestión de tareas",
+    "scripts": {
+        "dev": "npm run dev --prefix frontend",
+        "build": "npm run build --prefix frontend",
+        "start": "npm run start --prefix frontend",
+        "lint": "npm run lint --prefix frontend",
+        "install:frontend": "npm install --prefix frontend",
+        "install:all": "npm run install:frontend"
+    },
+    "keywords": [
+        "task-manager",
+        "nextjs",
+        "react",
+        "typescript",
+        "tailwind"
+    ],
+    "author": "",
+    "license": "MIT",
+    "workspaces": [
+        "frontend"
+    ]
+}

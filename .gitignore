@@ -1,0 +1,12 @@
+/node_modules/
+
+/backend/node_modules
+/backend/.env
+/backend/.env.local
+
+/frontend/node_modules
+/frontend/.env
+/.env
+/.env.local
+/.env.development
+

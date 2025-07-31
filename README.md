@@ -4,7 +4,7 @@
 
 - **Backend Node.js (Express)**
     - API REST principal para CRUD de tareas, usuarios, proyectos, etc.
-    - Acceso a PostgreSQL para almacenamiento persistente.
+    - MongoDB para BDD
 - **Servicio de notificaciones en Python (FastAPI)**
     - Microservicio separado encargado de enviar notificaciones (email, push, etc).
     - Recibe eventos (ej. creación, actualización de tarea) desde backend principal o directamente desde frontend.

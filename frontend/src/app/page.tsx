@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { healthCheck } from '@/services/api';
+import { healthCheck, HealthStatus } from '@/services/api';
 
 export default function Home() {
-    const [apiStatus, setApiStatus] = useState(null);
+    const [apiStatus, setApiStatus] = useState<HealthStatus | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {

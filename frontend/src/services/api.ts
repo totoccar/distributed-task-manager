@@ -9,7 +9,33 @@ const api = axios.create({
     },
 });
 
-// Interfaces para TypeScript
+// Interceptor para agregar token automáticamente
+api.interceptors.request.use(
+    (config) => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
+    }
+);
+
+// Interceptor para manejar respuestas de error (token expirado)
+api.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response?.status === 401) {
+            // Token expirado o inválido
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = '/login';
+        }
+        return Promise.reject(error);
+    }
+);// Interfaces para TypeScript
 export interface Task {
     _id: string;
     title: string;

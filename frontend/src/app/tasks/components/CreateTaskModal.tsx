@@ -1,12 +1,13 @@
 import { useState } from "react";
-import { Task } from "../page";
+import { Task } from '@/services/api';
 
 interface CreateTaskModalProps {
+    isOpen: boolean;
     onClose: () => void;
-    onSubmit: (taskData: Partial<Task>) => void;
+    onSubmit: (taskData: Partial<Task>) => Promise<void>;
 }
 
-export default function CreateTaskModal({ onClose, onSubmit }: CreateTaskModalProps) {
+export default function CreateTaskModal({ isOpen, onClose, onSubmit }: CreateTaskModalProps) {
     const [formData, setFormData] = useState<{
         title: string;
         description: string;
@@ -21,10 +22,10 @@ export default function CreateTaskModal({ onClose, onSubmit }: CreateTaskModalPr
         dueDate: ''
     });
 
-    const handleSubmit = (e: { preventDefault: () => void; }) => {
+    const handleSubmit = async (e: { preventDefault: () => void; }) => {
         e.preventDefault();
         if (formData.title.trim()) {
-            onSubmit(formData);
+            await onSubmit(formData);
         }
     };
 
@@ -34,6 +35,8 @@ export default function CreateTaskModal({ onClose, onSubmit }: CreateTaskModalPr
             [e.target.name]: e.target.value
         });
     };
+
+    if (!isOpen) return null;
 
     return (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">

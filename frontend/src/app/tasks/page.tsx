@@ -1,21 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { taskService } from '@/services/api';
+import { taskService, Task } from '@/services/api';
 import ConfirmDelete from './confirmDelete';
 import CreateTaskModal from './components/CreateTaskModal';
 import TaskCard from './components/TaskCard';
-
-// Define the Task type according to your API response
-export interface Task {
-    _id: string;
-    title: string;
-    description?: string;
-    status?: "pending" | "in-progress" | "completed";
-    priority?: "medium" | "low" | "high";
-    dueDate?: string;
-    createdAt: string;
-}
 
 export default function TasksPage() {
     const [tasks, setTasks] = useState<Task[]>([]);
@@ -233,6 +222,7 @@ export default function TasksPage() {
             {/* Create Task Modal */}
             {showCreateForm && (
                 <CreateTaskModal
+                    isOpen={showCreateForm}
                     onClose={() => setShowCreateForm(false)}
                     onSubmit={handleCreateTask}
                 />
@@ -241,9 +231,9 @@ export default function TasksPage() {
             {/* Delete Confirmation Modal */}
             {taskToDelete && (
                 <ConfirmDelete
-                    taskName={taskToDelete.title}
-                    taskId={taskToDelete._id}
-                    onDelete={handleDeleteTask}
+                    isOpen={!!taskToDelete}
+                    taskTitle={taskToDelete.title}
+                    onConfirm={() => handleDeleteTask(taskToDelete._id)}
                     onClose={() => setTaskToDelete(null)}
                 />
             )}

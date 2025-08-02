@@ -3,8 +3,11 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
+const path = require('path');
+
+require('dotenv').config({ path: path.join(__dirname, '../.env') });
+
 const connectDB = require('./config/database-config');
-require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -29,12 +32,8 @@ app.get('/api/health', (req, res) => {
 });
 
 // Rutas principales
+app.use('/api/auth', require('./routes/auth'));
 app.use('/api/tasks', require('./routes/tasks'));
-
-// Rutas por implementar
-// app.use('/api/auth', require('./routes/auth'));
-// app.use('/api/users', require('./routes/users'));
-// app.use('/api/projects', require('./routes/projects'));
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);

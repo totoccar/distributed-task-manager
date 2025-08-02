@@ -1,34 +1,18 @@
-# Task Manager Distribuido
+# 🧠 Task Manager Distribuido
 
-## Arquitectura general propuesta
+Práctica DevOps y microservicios, simula un sistema de gestión de tareas distribuido con:
 
-- **Backend Node.js (Express)**
-    - API REST principal para CRUD de tareas, usuarios, proyectos, etc.
-    - MongoDB para BDD
-- **Servicio de notificaciones en Python (FastAPI)**
-    - Microservicio separado encargado de enviar notificaciones (email, push, etc).
-    - Recibe eventos (ej. creación, actualización de tarea) desde backend principal o directamente desde frontend.
-    - Puede usar Redis para caché o cola de mensajes.
-- **Frontend Next.js**
-    - Consume la API REST de Node.js para gestionar tareas.
-    - Opcionalmente puede consumir directamente el servicio de notificaciones para configurar alertas.
-- **Base de datos**
-    - PostgreSQL para datos relacionales principales (tareas, usuarios, etc).
-    - Redis para caché y/o mensajes entre servicios.
+- 🟦 Backend principal: Node.js + Express
+- 🟨 Microservicio: FastAPI (Python) para notificaciones
+- 🟥 Redis: para pub/sub y caché
+- 🟩 Base de datos: MongoDB (local o MongoDB Atlas)
+- 🐳 Contenerización: Docker + Docker Compose
 
-## Estructura básica y stack
+---
 
-- Backend **Node.js**
-    - Express + Sequelize/TypeORM/Prisma para PostgreSQL
-    - JWT para autenticación
-    - API REST con endpoints para tareas, usuarios, proyectos.
-- Servicio **Python** (FastAPI)
-    - Endpoint para recibir eventos (ej. POST /notify)
-    - Manejo de tareas de notificación (email con SMTP o servicios externos)
-    - Uso de Redis para cachear usuarios o colas.
-- Frontend **Next.js**
-    - Autenticación (ejemplo: NextAuth o JWT)
-    - Páginas para listado y gestión de tareas
-    - Consumo de API REST con fetch/axios.
+## 🚀 Incluye
 
-Proyecto llevado a cabo para ganar experiencia hands-on en containerizacion, pipelines, y monitoring.
+- CRUD de tareas desde el backend Node.js
+- Microservicio que escucha eventos `"task.created"` desde Redis
+- Infraestructura multi-servicio orquestada con Docker
+- Posibilidad de desplegar en Railway o AWS

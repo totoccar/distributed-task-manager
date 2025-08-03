@@ -3,6 +3,13 @@
 import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
+import { UserPlus, Loader2, Mail, Lock, User, Shield, Briefcase, Settings } from 'lucide-react';
 
 const RegisterPage = () => {
     const [formData, setFormData] = useState({
@@ -20,6 +27,13 @@ const RegisterPage = () => {
         setFormData(prev => ({
             ...prev,
             [e.target.name]: e.target.value
+        }));
+    };
+
+    const handleRoleChange = (value: string) => {
+        setFormData(prev => ({
+            ...prev,
+            role: value
         }));
     };
 
@@ -49,132 +63,190 @@ const RegisterPage = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
-            <div className="absolute inset-0 bg-black opacity-50"></div>
-
-            <div className="relative z-10 w-full max-w-md">
-                <div className="bg-white/10 backdrop-blur-lg rounded-2xl shadow-2xl p-8 border border-white/20">
-                    <div className="text-center mb-8">
-                        <h1 className="text-3xl font-bold text-white mb-2">Create Account</h1>
-                        <p className="text-gray-300">Join our task management platform</p>
-                    </div>
-
-                    {error && (
-                        <div className="mb-6 p-4 bg-red-500/20 border border-red-500/50 rounded-lg">
-                            <p className="text-red-200 text-sm">{error}</p>
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white via-slate-50 to-blue-50 p-4">
+            <div className="w-full max-w-md">
+                <Card className="bg-white/70 backdrop-blur-xl border-white/40 shadow-xl">
+                    <CardHeader className="text-center">
+                        <div className="mx-auto mb-4 w-12 h-12 bg-gradient-to-br from-[#5a689c]/20 to-[#727fb4]/20 backdrop-blur rounded-full flex items-center justify-center">
+                            <UserPlus className="w-6 h-6 text-[#5a689c]" />
                         </div>
-                    )}
+                        <CardTitle className="text-2xl text-[#425183]">Create Account</CardTitle>
+                        <CardDescription className="text-[#8995cd]">
+                            Join our task management platform
+                        </CardDescription>
+                    </CardHeader>
 
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        <div>
-                            <label htmlFor="name" className="block text-sm font-medium text-gray-200 mb-2">
-                                Full Name
-                            </label>
-                            <input
-                                id="name"
-                                name="name"
-                                type="text"
-                                value={formData.name}
-                                onChange={handleChange}
-                                required
-                                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                                placeholder="Enter your full name"
-                            />
-                        </div>
+                    <CardContent>
+                        {error && (
+                            <div className="mb-6 p-4 bg-destructive/20 border border-destructive/50 rounded-lg">
+                                <p className="text-destructive text-sm">{error}</p>
+                            </div>
+                        )}
 
-                        <div>
-                            <label htmlFor="email" className="block text-sm font-medium text-gray-200 mb-2">
-                                Email Address
-                            </label>
-                            <input
-                                id="email"
-                                name="email"
-                                type="email"
-                                value={formData.email}
-                                onChange={handleChange}
-                                required
-                                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                                placeholder="Enter your email"
-                            />
-                        </div>
+                        <form onSubmit={handleSubmit} className="space-y-6">
+                            <div className="space-y-2">
+                                <Label htmlFor="name" className="text-gray-700 flex items-center gap-2">
+                                    <User className="w-4 h-4" />
+                                    Full Name
+                                </Label>
+                                <Input
+                                    id="name"
+                                    name="name"
+                                    type="text"
+                                    value={formData.name}
+                                    onChange={handleChange}
+                                    required
+                                    placeholder="Enter your full name"
+                                    className="bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#990100] focus:ring-[#990100]"
+                                />
+                            </div>
 
-                        <div>
-                            <label htmlFor="role" className="block text-sm font-medium text-gray-200 mb-2">
-                                Role
-                            </label>
-                            <select
-                                id="role"
-                                name="role"
-                                value={formData.role}
-                                onChange={handleChange}
-                                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                            <div className="space-y-2">
+                                <Label htmlFor="email" className="text-gray-700 flex items-center gap-2">
+                                    <Mail className="w-4 h-4" />
+                                    Email Address
+                                </Label>
+                                <Input
+                                    id="email"
+                                    name="email"
+                                    type="email"
+                                    value={formData.email}
+                                    onChange={handleChange}
+                                    required
+                                    placeholder="Enter your email"
+                                    className="bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#990100] focus:ring-[#990100]"
+                                />
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label className="text-gray-700 flex items-center gap-2">
+                                    <Shield className="w-4 h-4" />
+                                    Role
+                                </Label>
+                                <Select value={formData.role} onValueChange={handleRoleChange}>
+                                    <SelectTrigger className="bg-white border-gray-300 text-gray-900 focus:border-[#990100] focus:ring-[#990100]">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent className="bg-white border-gray-200">
+                                        <SelectItem value="user" className="text-gray-900 focus:bg-[#990100]/10">
+                                            <div className="flex items-center gap-2">
+                                                <User className="w-4 h-4" />
+                                                Developer
+                                            </div>
+                                        </SelectItem>
+                                        <SelectItem value="manager" className="text-gray-900 focus:bg-[#990100]/10">
+                                            <div className="flex items-center gap-2">
+                                                <Briefcase className="w-4 h-4" />
+                                                Manager
+                                            </div>
+                                        </SelectItem>
+                                        <SelectItem value="admin" className="text-gray-900 focus:bg-[#990100]/10">
+                                            <div className="flex items-center gap-2">
+                                                <Settings className="w-4 h-4" />
+                                                Admin
+                                            </div>
+                                        </SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="password" className="text-gray-700 flex items-center gap-2">
+                                    <Lock className="w-4 h-4" />
+                                    Password
+                                </Label>
+                                <Input
+                                    id="password"
+                                    name="password"
+                                    type="password"
+                                    value={formData.password}
+                                    onChange={handleChange}
+                                    required
+                                    placeholder="Enter your password"
+                                    className="bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#990100] focus:ring-[#990100]"
+                                />
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="confirmPassword" className="text-gray-700 flex items-center gap-2">
+                                    <Lock className="w-4 h-4" />
+                                    Confirm Password
+                                </Label>
+                                <Input
+                                    id="confirmPassword"
+                                    name="confirmPassword"
+                                    type="password"
+                                    value={formData.confirmPassword}
+                                    onChange={handleChange}
+                                    required
+                                    placeholder="Confirm your password"
+                                    className="bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#990100] focus:ring-[#990100]"
+                                />
+                            </div>
+
+                            <Button
+                                type="submit"
+                                disabled={loading}
+                                className="w-full"
+                                size="lg"
                             >
-                                <option value="user" className="bg-gray-800">Developer</option>
-                                <option value="manager" className="bg-gray-800">Manager</option>
-                                <option value="admin" className="bg-gray-800">Admin</option>
-                            </select>
+                                {loading ? (
+                                    <>
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        Creating account...
+                                    </>
+                                ) : (
+                                    <>
+                                        <UserPlus className="mr-2 h-4 w-4" />
+                                        Create Account
+                                    </>
+                                )}
+                            </Button>
+                        </form>
+
+                        <div className="mt-6 text-center">
+                            <p className="text-gray-600">
+                                Already have an account?{' '}
+                                <Link
+                                    href="/login"
+                                    className="text-[#990100] hover:text-[#b90504] font-semibold transition-colors duration-200"
+                                >
+                                    Sign in
+                                </Link>
+                            </p>
                         </div>
 
-                        <div>
-                            <label htmlFor="password" className="block text-sm font-medium text-gray-200 mb-2">
-                                Password
-                            </label>
-                            <input
-                                id="password"
-                                name="password"
-                                type="password"
-                                value={formData.password}
-                                onChange={handleChange}
-                                required
-                                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                                placeholder="Enter your password"
-                            />
-                        </div>
-
-                        <div>
-                            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-200 mb-2">
-                                Confirm Password
-                            </label>
-                            <input
-                                id="confirmPassword"
-                                name="confirmPassword"
-                                type="password"
-                                value={formData.confirmPassword}
-                                onChange={handleChange}
-                                required
-                                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
-                                placeholder="Confirm your password"
-                            />
-                        </div>
-
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg shadow-lg hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            {loading ? (
-                                <div className="flex items-center justify-center">
-                                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                                    Creating account...
+                        {/* Role Descriptions */}
+                        <Card className="mt-6 bg-gray-50/50 border-gray-200">
+                            <CardHeader className="pb-3">
+                                <CardTitle className="text-sm text-gray-900">Role Permissions</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-2">
+                                <div className="flex items-center justify-between text-xs">
+                                    <div className="flex items-center gap-2">
+                                        <User className="w-3 h-3 text-[#990100]" />
+                                        <Badge variant="secondary" className="bg-[#dc2626]/10 text-[#dc2626] text-xs border-[#dc2626]/20">Developer</Badge>
+                                    </div>
+                                    <span className="text-gray-600">View and manage own tasks</span>
                                 </div>
-                            ) : (
-                                'Create Account'
-                            )}
-                        </button>
-                    </form>
-
-                    <div className="mt-8 text-center">
-                        <p className="text-gray-300">
-                            Already have an account?{' '}
-                            <Link
-                                href="/login"
-                                className="text-blue-400 hover:text-blue-300 font-semibold transition-colors duration-200"
-                            >
-                                Sign in
-                            </Link>
-                        </p>
-                    </div>
-                </div>
+                                <div className="flex items-center justify-between text-xs">
+                                    <div className="flex items-center gap-2">
+                                        <Briefcase className="w-3 h-3 text-[#990100]" />
+                                        <Badge variant="secondary" className="bg-[#b90504]/10 text-[#b90504] text-xs border-[#b90504]/20">Manager</Badge>
+                                    </div>
+                                    <span className="text-gray-600">Assign tasks to team members</span>
+                                </div>
+                                <div className="flex items-center justify-between text-xs">
+                                    <div className="flex items-center gap-2">
+                                        <Settings className="w-3 h-3 text-[#990100]" />
+                                        <Badge variant="secondary" className="bg-[#990100]/10 text-[#990100] text-xs border-[#990100]/20">Admin</Badge>
+                                    </div>
+                                    <span className="text-gray-600">Full system access</span>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </CardContent>
+                </Card>
             </div>
         </div>
     );

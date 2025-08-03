@@ -1,6 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const taskController = require('../controllers/taskController');
+const { auth } = require('../middleware/auth');
+
+// Aplicar middleware de autenticación a todas las rutas
+router.use(auth);
 
 // GET /api/tasks - Obtener todas las tareas
 router.get('/', taskController.getAllTasks);

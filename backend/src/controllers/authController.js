@@ -183,6 +183,31 @@ const authController = {
                 error: error.message
             });
         }
+    },
+
+    // GET /api/auth/users
+    getUsers: async (req, res) => {
+        try {
+            // Solo admin y manager pueden ver todos los usuarios
+            if (req.user.role !== 'admin' && req.user.role !== 'manager') {
+                return res.status(403).json({
+                    success: false,
+                    message: 'Access denied'
+                });
+            }
+
+            const users = await User.find({
+                isActive: true
+            }).select('name email role avatar createdAt');
+
+            res.json(users);
+        } catch (error) {
+            res.status(500).json({
+                success: false,
+                message: 'Error fetching users',
+                error: error.message
+            });
+        }
     }
 };
 

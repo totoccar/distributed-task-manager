@@ -4,6 +4,10 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Rocket, Users, BarChart3, User, Briefcase, Settings, Loader2 } from 'lucide-react';
 
 export default function HomePage() {
     const { isAuthenticated, loading } = useAuth();
@@ -17,10 +21,10 @@ export default function HomePage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white to-gray-100">
                 <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-                    <p className="text-white text-lg">Loading...</p>
+                    <Loader2 className="h-12 w-12 animate-spin text-[#990100] mx-auto mb-4" />
+                    <p className="text-gray-700 text-lg">Loading...</p>
                 </div>
             </div>
         );
@@ -31,80 +35,107 @@ export default function HomePage() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
-            <div className="absolute inset-0 bg-black opacity-50"></div>
-
+        <div className="min-h-screen bg-gradient-to-br from-white via-slate-50 to-blue-50">
             <div className="relative z-10 min-h-screen flex items-center justify-center px-4">
                 <div className="text-center max-w-4xl mx-auto">
                     {/* Hero Section */}
                     <div className="mb-12">
-                        <h1 className="text-6xl md:text-7xl font-bold text-white mb-6 leading-tight">
+                        <h1 className="text-6xl md:text-7xl font-bold text-[#425183] mb-6 leading-tight">
                             Distributed
-                            <span className="block bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                            <span className="block bg-gradient-to-r from-[#5a689c] to-[#727fb4] bg-clip-text text-transparent">
                                 Task Manager
                             </span>
                         </h1>
-                        <p className="text-xl md:text-2xl text-gray-300 mb-8 leading-relaxed">
+                        <p className="text-xl md:text-2xl text-[#8995cd] mb-8 leading-relaxed">
                             Collaborate, organize, and achieve more with our modern task management platform
                         </p>
                     </div>
 
                     {/* Features Grid */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-                        <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
-                            <div className="text-4xl mb-4">🚀</div>
-                            <h3 className="text-xl font-bold text-white mb-2">Fast & Efficient</h3>
-                            <p className="text-gray-300 text-sm">Streamlined workflows for maximum productivity</p>
-                        </div>
+                        <Card className="bg-white/70 backdrop-blur-xl border-white/40 hover:border-[#5a689c]/50 transition-all duration-300 shadow-lg hover:shadow-xl">
+                            <CardHeader className="text-center">
+                                <Rocket className="h-12 w-12 text-[#5a689c] mx-auto mb-2" />
+                                <CardTitle className="text-[#425183]">Fast & Efficient</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <CardDescription className="text-[#8995cd]">
+                                    Streamlined workflows for maximum productivity
+                                </CardDescription>
+                            </CardContent>
+                        </Card>
 
-                        <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
-                            <div className="text-4xl mb-4">👥</div>
-                            <h3 className="text-xl font-bold text-white mb-2">Team Collaboration</h3>
-                            <p className="text-gray-300 text-sm">Work together seamlessly with role-based access</p>
-                        </div>
+                        <Card className="bg-white/70 backdrop-blur-xl border-white/40 hover:border-[#5a689c]/50 transition-all duration-300 shadow-lg hover:shadow-xl">
+                            <CardHeader className="text-center">
+                                <Users className="h-12 w-12 text-[#5a689c] mx-auto mb-2" />
+                                <CardTitle className="text-[#425183]">Team Collaboration</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <CardDescription className="text-[#8995cd]">
+                                    Work together seamlessly with role-based access
+                                </CardDescription>
+                            </CardContent>
+                        </Card>
 
-                        <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
-                            <div className="text-4xl mb-4">📊</div>
-                            <h3 className="text-xl font-bold text-white mb-2">Analytics & Reports</h3>
-                            <p className="text-gray-300 text-sm">Track progress with detailed insights</p>
-                        </div>
+                        <Card className="bg-white/70 backdrop-blur-xl border-white/40 hover:border-[#5a689c]/50 transition-all duration-300 shadow-lg hover:shadow-xl">
+                            <CardHeader className="text-center">
+                                <BarChart3 className="h-12 w-12 text-[#5a689c] mx-auto mb-2" />
+                                <CardTitle className="text-[#425183]">Analytics & Reports</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <CardDescription className="text-[#8995cd]">
+                                    Track progress with detailed insights
+                                </CardDescription>
+                            </CardContent>
+                        </Card>
                     </div>
 
                     {/* CTA Buttons */}
                     <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-                        <Link
-                            href="/login"
-                            className="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg shadow-lg hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-transparent transition-all duration-200 text-center"
-                        >
-                            Sign In
-                        </Link>
+                        <Button asChild size="lg" className="w-full sm:w-auto">
+                            <Link href="/login">
+                                Sign In
+                            </Link>
+                        </Button>
 
-                        <Link
-                            href="/register"
-                            className="w-full sm:w-auto px-8 py-4 bg-white/10 text-white font-semibold rounded-lg border border-white/20 hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50 transition-all duration-200 text-center"
-                        >
-                            Get Started
-                        </Link>
+                        <Button asChild variant="outline" size="lg" className="w-full sm:w-auto">
+                            <Link href="/register">
+                                Get Started
+                            </Link>
+                        </Button>
                     </div>
 
                     {/* Demo Info */}
-                    <div className="mt-12 p-6 bg-white/5 rounded-2xl border border-white/10">
-                        <h3 className="text-lg font-semibold text-white mb-4">Try Demo Accounts</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                            <div className="bg-white/10 rounded-lg p-4">
-                                <div className="text-blue-400 font-medium mb-1">👤 User Account</div>
-                                <div className="text-gray-300">user@demo.com / password</div>
+                    <Card className="mt-12 bg-white/70 backdrop-blur-xl border-white/40 shadow-lg">
+                        <CardHeader>
+                            <CardTitle className="text-[#425183]">Try Demo Accounts</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                                <div className="bg-gradient-to-br from-white/60 to-blue-50/60 backdrop-blur rounded-lg p-4 border border-white/30">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <User className="h-4 w-4 text-[#5a689c]" />
+                                        <Badge variant="secondary" className="bg-[#a1ace5]/20 text-[#425183] border-[#a1ace5]/30">User Account</Badge>
+                                    </div>
+                                    <div className="text-[#8995cd]">user@demo.com / password</div>
+                                </div>
+                                <div className="bg-gradient-to-br from-white/60 to-blue-50/60 backdrop-blur rounded-lg p-4 border border-white/30">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <Briefcase className="h-4 w-4 text-[#5a689c]" />
+                                        <Badge variant="secondary" className="bg-[#8995cd]/20 text-[#425183] border-[#8995cd]/30">Manager Account</Badge>
+                                    </div>
+                                    <div className="text-[#8995cd]">manager@demo.com / password</div>
+                                </div>
+                                <div className="bg-gradient-to-br from-white/60 to-blue-50/60 backdrop-blur rounded-lg p-4 border border-white/30">
+                                    <div className="flex items-center gap-2 mb-2">
+                                        <Settings className="h-4 w-4 text-[#5a689c]" />
+                                        <Badge variant="secondary" className="bg-[#727fb4]/20 text-[#425183] border-[#727fb4]/30">Admin Account</Badge>
+                                    </div>
+                                    <div className="text-[#8995cd]">admin@demo.com / password</div>
+                                </div>
                             </div>
-                            <div className="bg-white/10 rounded-lg p-4">
-                                <div className="text-purple-400 font-medium mb-1">👔 Manager Account</div>
-                                <div className="text-gray-300">manager@demo.com / password</div>
-                            </div>
-                            <div className="bg-white/10 rounded-lg p-4">
-                                <div className="text-red-400 font-medium mb-1">⚙️ Admin Account</div>
-                                <div className="text-gray-300">admin@demo.com / password</div>
-                            </div>
-                        </div>
-                    </div>
+                        </CardContent>
+                    </Card>
                 </div>
             </div>
         </div>

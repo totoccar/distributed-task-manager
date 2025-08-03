@@ -4,6 +4,22 @@ import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import {
+    CheckSquare,
+    FolderOpen,
+    Users,
+    BarChart3,
+    Settings,
+    Wrench,
+    ArrowRight,
+    LogOut,
+    User,
+    Calendar,
+    Target
+} from 'lucide-react';
 
 const DashboardPage = () => {
     const { user, logout, hasRole } = useAuth();
@@ -14,51 +30,51 @@ const DashboardPage = () => {
             title: 'My Tasks',
             description: 'View and manage your assigned tasks',
             href: '/tasks',
-            icon: '📋',
+            icon: CheckSquare,
             roles: ['user', 'manager', 'admin'],
-            color: 'from-blue-500 to-blue-600'
+            color: 'bg-gradient-to-br from-[#5a689c]/20 to-[#727fb4]/20 hover:from-[#5a689c]/30 hover:to-[#727fb4]/30'
         },
         {
             title: 'Projects',
             description: 'Browse all projects',
             href: '/projects',
-            icon: '📁',
+            icon: FolderOpen,
             roles: ['user', 'manager', 'admin'],
-            color: 'from-green-500 to-green-600'
+            color: 'bg-gradient-to-br from-[#727fb4]/20 to-[#8995cd]/20 hover:from-[#727fb4]/30 hover:to-[#8995cd]/30'
         },
         // Items solo para managers y admins
         {
             title: 'Team Management',
             description: 'Manage team members and assignments',
             href: '/team',
-            icon: '👥',
+            icon: Users,
             roles: ['manager', 'admin'],
-            color: 'from-purple-500 to-purple-600'
+            color: 'bg-gradient-to-br from-[#8995cd]/20 to-[#a1ace5]/20 hover:from-[#8995cd]/30 hover:to-[#a1ace5]/30'
         },
         {
             title: 'Analytics',
             description: 'View performance metrics and reports',
             href: '/analytics',
-            icon: '📊',
+            icon: BarChart3,
             roles: ['manager', 'admin'],
-            color: 'from-orange-500 to-orange-600'
+            color: 'bg-gradient-to-br from-[#a1ace5]/20 to-[#5a689c]/20 hover:from-[#a1ace5]/30 hover:to-[#5a689c]/30'
         },
         // Items solo para admins
         {
             title: 'User Management',
             description: 'Manage users, roles and permissions',
             href: '/admin/users',
-            icon: '⚙️',
+            icon: Settings,
             roles: ['admin'],
-            color: 'from-red-500 to-red-600'
+            color: 'bg-gradient-to-br from-[#5a689c]/20 to-[#425183]/20 hover:from-[#5a689c]/30 hover:to-[#425183]/30'
         },
         {
             title: 'System Settings',
             description: 'Configure system-wide settings',
             href: '/admin/settings',
-            icon: '🔧',
+            icon: Wrench,
             roles: ['admin'],
-            color: 'from-gray-500 to-gray-600'
+            color: 'bg-gradient-to-br from-[#727fb4]/20 to-[#5a689c]/20 hover:from-[#727fb4]/30 hover:to-[#5a689c]/30'
         }
     ];
 
@@ -69,46 +85,49 @@ const DashboardPage = () => {
     const getRoleBadgeColor = (role: string) => {
         switch (role) {
             case 'admin':
-                return 'bg-red-500/20 text-red-300 border-red-500/50';
+                return 'bg-[#5a689c]/20 text-[#425183] border-[#5a689c]/40';
             case 'manager':
-                return 'bg-purple-500/20 text-purple-300 border-purple-500/50';
+                return 'bg-[#727fb4]/20 text-[#425183] border-[#727fb4]/40';
             default:
-                return 'bg-blue-500/20 text-blue-300 border-blue-500/50';
+                return 'bg-[#8995cd]/20 text-[#425183] border-[#8995cd]/40';
         }
     };
 
     return (
         <ProtectedRoute>
-            <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
+            <div className="min-h-screen bg-gradient-to-br from-white via-slate-50 to-blue-50">
                 {/* Header */}
-                <div className="bg-white/10 backdrop-blur-lg border-b border-white/20">
+                <div className="bg-white/70 backdrop-blur-xl border-b border-white/40 shadow-sm">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="flex justify-between items-center py-6">
                             <div className="flex items-center space-x-4">
-                                <h1 className="text-2xl font-bold text-white">Task Manager</h1>
-                                <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getRoleBadgeColor(user?.role || 'user')}`}>
+                                <h1 className="text-2xl font-bold text-[#425183]">Task Manager</h1>
+                                <Badge className={`text-xs font-medium border ${getRoleBadgeColor(user?.role || 'user')}`}>
                                     {user?.role?.toUpperCase()}
-                                </span>
+                                </Badge>
                             </div>
 
                             <div className="flex items-center space-x-4">
                                 <div className="text-right">
-                                    <p className="text-white font-medium">{user?.name}</p>
-                                    <p className="text-gray-300 text-sm">{user?.email}</p>
+                                    <p className="text-[#425183] font-medium">{user?.name}</p>
+                                    <p className="text-[#8995cd] text-sm">{user?.email}</p>
                                 </div>
 
-                                <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
+                                <div className="w-10 h-10 bg-gradient-to-r from-[#5a689c] to-[#727fb4] rounded-full flex items-center justify-center">
                                     <span className="text-white font-bold text-lg">
                                         {user?.name?.charAt(0).toUpperCase()}
                                     </span>
                                 </div>
 
-                                <button
+                                <Button
                                     onClick={logout}
-                                    className="px-4 py-2 bg-red-500/20 text-red-300 rounded-lg border border-red-500/50 hover:bg-red-500/30 transition-all duration-200"
+                                    variant="outline"
+                                    size="sm"
+                                    className="border-destructive/50 text-destructive hover:bg-destructive/10"
                                 >
+                                    <LogOut className="w-4 h-4 mr-2" />
                                     Logout
-                                </button>
+                                </Button>
                             </div>
                         </div>
                     </div>
@@ -118,59 +137,81 @@ const DashboardPage = () => {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                     {/* Welcome Section */}
                     <div className="text-center mb-12">
-                        <h2 className="text-4xl font-bold text-white mb-4">
-                            Welcome back, {user?.name?.split(' ')[0]}! 👋
+                        <h2 className="text-4xl font-bold text-[#425183] mb-4">
+                            Welcome back, {user?.name?.split(' ')[0]}!
                         </h2>
-                        <p className="text-gray-300 text-lg">
+                        <p className="text-[#8995cd] text-lg">
                             What would you like to work on today?
                         </p>
                     </div>
 
                     {/* Menu Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {availableMenuItems.map((item, index) => (
-                            <Link
-                                key={index}
-                                href={item.href}
-                                className="group block"
-                            >
-                                <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 hover:bg-white/20 transition-all duration-300 group-hover:scale-105 group-hover:shadow-2xl">
-                                    <div className="flex items-center mb-4">
-                                        <div className={`w-12 h-12 bg-gradient-to-r ${item.color} rounded-xl flex items-center justify-center text-2xl mr-4`}>
-                                            {item.icon}
-                                        </div>
-                                        <h3 className="text-xl font-bold text-white group-hover:text-blue-300 transition-colors duration-200">
-                                            {item.title}
-                                        </h3>
-                                    </div>
-                                    <p className="text-gray-300 group-hover:text-gray-200 transition-colors duration-200">
-                                        {item.description}
-                                    </p>
-                                    <div className="mt-4 flex items-center text-blue-400 group-hover:text-blue-300 transition-colors duration-200">
-                                        <span className="text-sm font-medium">Access now</span>
-                                        <svg className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                        </svg>
-                                    </div>
-                                </div>
-                            </Link>
-                        ))}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
+                        {availableMenuItems.map((item, index) => {
+                            const IconComponent = item.icon;
+                            return (
+                                <Link
+                                    key={index}
+                                    href={item.href}
+                                    className="group block"
+                                >
+                                    <Card className="bg-white/70 backdrop-blur-xl border-white/40 hover:bg-white/80 hover:border-[#5a689c]/50 hover:shadow-xl transition-all duration-300 group-hover:scale-105">
+                                        <CardHeader className="pb-3">
+                                            <div className="flex items-center mb-2">
+                                                <div className={`w-12 h-12 ${item.color} backdrop-blur rounded-xl flex items-center justify-center mr-4 transition-all duration-300`}>
+                                                    <IconComponent className="w-6 h-6 text-[#5a689c]" />
+                                                </div>
+                                                <CardTitle className="text-xl text-[#425183] group-hover:text-[#5a689c] transition-colors duration-200">
+                                                    {item.title}
+                                                </CardTitle>
+                                            </div>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <CardDescription className="text-[#8995cd] group-hover:text-[#727fb4] transition-colors duration-200 mb-4">
+                                                {item.description}
+                                            </CardDescription>
+                                            <div className="flex items-center text-[#5a689c] group-hover:text-[#727fb4] transition-colors duration-200">
+                                                <span className="text-sm font-medium">Access now</span>
+                                                <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-200" />
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                </Link>
+                            );
+                        })}
                     </div>
 
                     {/* Quick Stats */}
-                    <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 text-center">
-                            <div className="text-3xl font-bold text-blue-400 mb-2">12</div>
-                            <div className="text-gray-300">Active Tasks</div>
-                        </div>
-                        <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 text-center">
-                            <div className="text-3xl font-bold text-green-400 mb-2">5</div>
-                            <div className="text-gray-300">Completed Today</div>
-                        </div>
-                        <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20 text-center">
-                            <div className="text-3xl font-bold text-purple-400 mb-2">3</div>
-                            <div className="text-gray-300">Projects</div>
-                        </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <Card className="bg-white/70 backdrop-blur-xl border-white/40 shadow-lg">
+                            <CardContent className="text-center p-6">
+                                <div className="flex items-center justify-center mb-3">
+                                    <CheckSquare className="w-8 h-8 text-[#5a689c] mr-2" />
+                                    <div className="text-3xl font-bold text-[#425183]">12</div>
+                                </div>
+                                <div className="text-[#8995cd]">Active Tasks</div>
+                            </CardContent>
+                        </Card>
+
+                        <Card className="bg-white/70 backdrop-blur-xl border-white/40 shadow-lg">
+                            <CardContent className="text-center p-6">
+                                <div className="flex items-center justify-center mb-3">
+                                    <Calendar className="w-8 h-8 text-[#727fb4] mr-2" />
+                                    <div className="text-3xl font-bold text-[#425183]">5</div>
+                                </div>
+                                <div className="text-[#8995cd]">Completed Today</div>
+                            </CardContent>
+                        </Card>
+
+                        <Card className="bg-white/70 backdrop-blur-xl border-white/40 shadow-lg">
+                            <CardContent className="text-center p-6">
+                                <div className="flex items-center justify-center mb-3">
+                                    <Target className="w-8 h-8 text-[#8995cd] mr-2" />
+                                    <div className="text-3xl font-bold text-[#425183]">3</div>
+                                </div>
+                                <div className="text-[#8995cd]">Projects</div>
+                            </CardContent>
+                        </Card>
                     </div>
                 </div>
             </div>

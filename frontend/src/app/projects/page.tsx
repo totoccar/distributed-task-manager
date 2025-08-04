@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Plus, Calendar, Users, BarChart3, Clock } from 'lucide-react';
 import CreateProjectModal from './components/CreateProjectModal';
 import { useAuth } from '@/contexts/AuthContext';
+import { projectService } from '@/services/api';
 
 interface Project {
     _id: string;
@@ -47,19 +48,8 @@ export default function ProjectsPage() {
 
     const fetchProjects = async () => {
         try {
-            const response = await fetch('http://localhost:3000/api/projects', {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                },
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                setProjects(data);
-            } else {
-                console.error('Error fetching projects');
-            }
+            const data = await projectService.getAllProjects();
+            setProjects(data);
         } catch (error) {
             console.error('Error:', error);
         } finally {

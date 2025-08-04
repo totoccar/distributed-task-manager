@@ -61,6 +61,32 @@ export interface HealthStatus {
     database?: string;
 }
 
+// Funciones para proyectos
+export const projectService = {
+    getAllProjects: async () => {
+        const response = await api.get('/projects');
+        return response.data;
+    },
+
+    createProject: async (projectData: any) => {
+        const response = await api.post('/projects', projectData);
+        return response.data;
+    },
+
+    getProject: async (id: string) => {
+        const response = await api.get(`/projects/${id}`);
+        return response.data;
+    },
+};
+
+// Funciones para usuarios
+export const userService = {
+    getAllUsers: async () => {
+        const response = await api.get('/auth/users');
+        return response.data;
+    },
+};
+
 // Funciones para tareas
 export const taskService = {
     getAllTasks: async (): Promise<Task[]> => {

@@ -19,6 +19,7 @@ import {
     PlayCircle
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { projectService } from '@/services/api';
 
 interface Task {
     _id: string;
@@ -83,20 +84,8 @@ export default function ProjectDetailPage() {
 
     const fetchProject = async () => {
         try {
-            const response = await fetch(`http://localhost:3000/api/projects/${params.id}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                },
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                setProject(data);
-            } else {
-                console.error('Error fetching project');
-                router.push('/projects');
-            }
+            const data = await projectService.getProject(params.id as string);
+            setProject(data);
         } catch (error) {
             console.error('Error:', error);
             router.push('/projects');

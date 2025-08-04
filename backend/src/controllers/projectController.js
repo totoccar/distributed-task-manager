@@ -48,9 +48,44 @@ exports.getProject = async (req, res) => {
         }
 
         // Verificar permisos
-        if (req.user.role !== 'admin' && !project.isUserAssigned(req.user.id) && !project.settings.isPublic) {
+        console.log('🔍 Verificando permisos para proyecto:', req.params.id);
+        console.log('👤 Usuario:', {
+            id: req.user.id,
+            _id: req.user._id,
+            role: req.user.role,
+            name: req.user.name
+        });
+        console.log('📝 Proyecto:', {
+            id: project._id.toString(),
+            manager: project.manager._id ? project.manager._id.toString() : project.manager.toString(),
+            isPublic: project.settings?.isPublic,
+            assignedUsers: project.assignedUsers.map(u => ({
+                userId: u.user._id.toString(),
+                role: u.role
+            }))
+        });
+
+        const isManager = project.manager._id ?
+            project.manager._id.toString() === req.user.id || project.manager._id.toString() === req.user._id :
+            project.manager.toString() === req.user.id || project.manager.toString() === req.user._id;
+
+        const isAssigned = project.assignedUsers.some(assignment =>
+            assignment.user._id.toString() === req.user.id || assignment.user._id.toString() === req.user._id
+        );
+
+        console.log('🔐 Verificaciones:', {
+            isAdmin: req.user.role === 'admin',
+            isManager,
+            isAssigned,
+            isPublic: project.settings?.isPublic || false
+        });
+
+        if (req.user.role !== 'admin' && !isManager && !isAssigned && !project.settings?.isPublic) {
+            console.log('❌ Acceso denegado');
             return res.status(403).json({ message: 'No tienes permisos para ver este proyecto' });
         }
+
+        console.log('✅ Acceso permitido');
 
         // Obtener las tareas del proyecto
         const tasks = await Task.find({ project: project._id })

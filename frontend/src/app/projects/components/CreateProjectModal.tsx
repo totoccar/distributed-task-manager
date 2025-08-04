@@ -9,6 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { X, Calendar, Users } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { projectService, userService } from '@/services/api';
 
 interface User {
     _id: string;
@@ -52,17 +53,8 @@ export default function CreateProjectModal({ isOpen, onClose, onProjectCreated }
     const fetchUsers = async () => {
         setLoadingUsers(true);
         try {
-            const response = await fetch('http://localhost:3000/api/auth/users', {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                },
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                setUsers(data);
-            }
+            const data = await userService.getAllUsers();
+            setUsers(data);
         } catch (error) {
             console.error('Error fetching users:', error);
         } finally {
@@ -75,22 +67,9 @@ export default function CreateProjectModal({ isOpen, onClose, onProjectCreated }
         setLoading(true);
 
         try {
-            const response = await fetch('http://localhost:3000/api/projects', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
-            });
-
-            if (response.ok) {
-                onProjectCreated();
-                resetForm();
-            } else {
-                const errorData = await response.json();
-                alert(errorData.message || 'Error al crear el proyecto');
-            }
+            await projectService.createProject(formData);
+            onProjectCreated();
+            resetForm();
         } catch (error) {
             console.error('Error creating project:', error);
             alert('Error al crear el proyecto');
@@ -308,22 +287,49 @@ export default function CreateProjectModal({ isOpen, onClose, onProjectCreated }
                                                             Remover
                                                         </Button>
                                                     ) : (
-                                                        <div className="flex gap-1">
+                                                        <div className="flex flex-wrap gap-1">
                                                             <Button
                                                                 type="button"
                                                                 variant="outline"
                                                                 size="sm"
-                                                                onClick={() => addUser(user._id, 'member')}
-                                                                className="border-blue-200 text-blue-600 hover:bg-blue-50"
+                                                                onClick={() => addUser(user._id, 'developer')}
+                                                                className="border-blue-200 text-blue-600 hover:bg-blue-50 text-xs"
                                                             >
-                                                                + Miembro
+                                                                + Developer
+                                                            </Button>
+                                                            <Button
+                                                                type="button"
+                                                                variant="outline"
+                                                                size="sm"
+                                                                onClick={() => addUser(user._id, 'designer')}
+                                                                className="border-purple-200 text-purple-600 hover:bg-purple-50 text-xs"
+                                                            >
+                                                                + Designer
+                                                            </Button>
+                                                            <Button
+                                                                type="button"
+                                                                variant="outline"
+                                                                size="sm"
+                                                                onClick={() => addUser(user._id, 'tester')}
+                                                                className="border-orange-200 text-orange-600 hover:bg-orange-50 text-xs"
+                                                            >
+                                                                + Tester
+                                                            </Button>
+                                                            <Button
+                                                                type="button"
+                                                                variant="outline"
+                                                                size="sm"
+                                                                onClick={() => addUser(user._id, 'analyst')}
+                                                                className="border-indigo-200 text-indigo-600 hover:bg-indigo-50 text-xs"
+                                                            >
+                                                                + Analyst
                                                             </Button>
                                                             <Button
                                                                 type="button"
                                                                 variant="outline"
                                                                 size="sm"
                                                                 onClick={() => addUser(user._id, 'lead')}
-                                                                className="border-green-200 text-green-600 hover:bg-green-50"
+                                                                className="border-green-200 text-green-600 hover:bg-green-50 text-xs"
                                                             >
                                                                 + Lead
                                                             </Button>

@@ -35,6 +35,7 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/tasks', require('./routes/tasks'));
 app.use('/api/projects', require('./routes/projects'));
+app.use('/api/dashboard', require('./routes/dashboard'));
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);

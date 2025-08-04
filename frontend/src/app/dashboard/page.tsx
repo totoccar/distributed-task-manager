@@ -1,12 +1,13 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { dashboardService } from '@/services/api';
 import {
     CheckSquare,
     FolderOpen,
@@ -21,8 +22,35 @@ import {
     Target
 } from 'lucide-react';
 
+interface DashboardStats {
+    activeTasks: number;
+    completedToday: number;
+    totalProjects: number;
+}
+
 const DashboardPage = () => {
     const { user, logout, hasRole } = useAuth();
+    const [stats, setStats] = useState<DashboardStats>({
+        activeTasks: 0,
+        completedToday: 0,
+        totalProjects: 0
+    });
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetchDashboardStats();
+    }, []);
+
+    const fetchDashboardStats = async () => {
+        try {
+            const data = await dashboardService.getStats();
+            setStats(data);
+        } catch (error) {
+            console.error('Error fetching dashboard stats:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const roleBasedMenuItems = [
         // Items para todos los usuarios autenticados
@@ -187,7 +215,9 @@ const DashboardPage = () => {
                             <CardContent className="text-center p-6">
                                 <div className="flex items-center justify-center mb-3">
                                     <CheckSquare className="w-8 h-8 text-[#5a689c] mr-2" />
-                                    <div className="text-3xl font-bold text-[#425183]">12</div>
+                                    <div className="text-3xl font-bold text-[#425183]">
+                                        {loading ? '...' : stats.activeTasks}
+                                    </div>
                                 </div>
                                 <div className="text-[#8995cd]">Active Tasks</div>
                             </CardContent>
@@ -197,7 +227,9 @@ const DashboardPage = () => {
                             <CardContent className="text-center p-6">
                                 <div className="flex items-center justify-center mb-3">
                                     <Calendar className="w-8 h-8 text-[#727fb4] mr-2" />
-                                    <div className="text-3xl font-bold text-[#425183]">5</div>
+                                    <div className="text-3xl font-bold text-[#425183]">
+                                        {loading ? '...' : stats.completedToday}
+                                    </div>
                                 </div>
                                 <div className="text-[#8995cd]">Completed Today</div>
                             </CardContent>
@@ -207,7 +239,9 @@ const DashboardPage = () => {
                             <CardContent className="text-center p-6">
                                 <div className="flex items-center justify-center mb-3">
                                     <Target className="w-8 h-8 text-[#8995cd] mr-2" />
-                                    <div className="text-3xl font-bold text-[#425183]">3</div>
+                                    <div className="text-3xl font-bold text-[#425183]">
+                                        {loading ? '...' : stats.totalProjects}
+                                    </div>
                                 </div>
                                 <div className="text-[#8995cd]">Projects</div>
                             </CardContent>

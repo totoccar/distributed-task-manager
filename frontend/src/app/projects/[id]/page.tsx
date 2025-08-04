@@ -174,14 +174,18 @@ export default function ProjectDetailPage() {
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
                 <div className="flex items-center gap-4 mb-6">
-                    <Button
-                        variant="ghost"
-                        onClick={() => router.push('/projects')}
-                        className="text-slate-600 hover:text-slate-800"
-                    >
-                        <ArrowLeft className="h-4 w-4 mr-2" />
-                        Volver
-                    </Button>
+                    <div className="flex items-center gap-4">
+                        <button
+                            onClick={() => window.location.href = '/'}
+                            className="flex items-center text-gray-600 hover:text-blue-600 transition-colors duration-200 group"
+                        >
+                            <svg className="w-5 h-5 mr-2 transform group-hover:-translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                            </svg>
+                        </button>
+                        <div className="hidden sm:block w-px mr-8 h-6 bg-gray-300"></div>
+
+                    </div>
                     <div className="flex-1">
                         <h1 className="text-3xl font-bold text-slate-800">{project.name}</h1>
                         <p className="text-slate-600 mt-1">{project.description}</p>

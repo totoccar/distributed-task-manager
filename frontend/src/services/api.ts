@@ -87,6 +87,19 @@ export const userService = {
     },
 };
 
+// Funciones para dashboard
+export const dashboardService = {
+    getStats: async () => {
+        const response = await api.get('/dashboard/stats');
+        return response.data;
+    },
+
+    getRecentTasks: async () => {
+        const response = await api.get('/dashboard/recent-tasks');
+        return response.data;
+    },
+};
+
 // Funciones para tareas
 export const taskService = {
     getAllTasks: async (): Promise<Task[]> => {

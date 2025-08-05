@@ -77,6 +77,11 @@ export const projectService = {
         const response = await api.get(`/projects/${id}`);
         return response.data;
     },
+
+    updateProject: async (id: string, projectData: any) => {
+        const response = await api.put(`/projects/${id}`, projectData);
+        return response.data;
+    },
 };
 
 // Funciones para usuarios
@@ -102,8 +107,9 @@ export const dashboardService = {
 
 // Funciones para tareas
 export const taskService = {
-    getAllTasks: async (): Promise<Task[]> => {
-        const response = await api.get<ApiResponse<Task[]>>('/tasks');
+    getAllTasks: async (showAll?: boolean): Promise<Task[]> => {
+        const params = showAll ? '?showAll=true' : '';
+        const response = await api.get<ApiResponse<Task[]>>(`/tasks${params}`);
         return response.data.data;
     },
 

@@ -172,7 +172,8 @@ exports.updateProject = async (req, res) => {
             startDate,
             endDate,
             deadline,
-            settings
+            settings,
+            assignedUsers
         } = req.body;
 
         // Actualizar campos permitidos
@@ -184,6 +185,11 @@ exports.updateProject = async (req, res) => {
         if (endDate !== undefined) project.endDate = endDate;
         if (deadline !== undefined) project.deadline = deadline;
         if (settings !== undefined) project.settings = { ...project.settings, ...settings };
+
+        // Actualizar usuarios asignados si se proporcionan
+        if (assignedUsers !== undefined) {
+            project.assignedUsers = assignedUsers;
+        }
 
         await project.save();
         await project.populate('manager', 'name email role');

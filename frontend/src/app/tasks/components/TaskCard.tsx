@@ -1,5 +1,5 @@
 import { JSX, useState } from "react";
-import { Task } from '@/services/api';
+import { Task, taskService } from '@/services/api';
 
 interface StatusColorProps {
     status?: "pending" | "in-progress" | "completed";
@@ -43,8 +43,9 @@ export default function TaskCard({ task, setTaskToDelete }: TaskCardProps): JSX.
 
     const handleSave = async () => {
         try {
-            // For now, just close the editing mode
-            // The parent component will handle updates
+
+            const updatedTask = await taskService.updateTask(task._id, editData);
+            setTask(updatedTask);
             setIsEditing(false);
         } catch (error) {
             console.error('Error saving task:', error);
@@ -78,14 +79,14 @@ export default function TaskCard({ task, setTaskToDelete }: TaskCardProps): JSX.
                         type="text"
                         value={editData.title}
                         onChange={(e) => setEditData(prev => ({ ...prev, title: e.target.value }))}
-                        className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 bg-white/10 border border-gray-200 hover:border-gray-300 transition-all rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         placeholder="Task title"
                     />
 
                     <textarea
                         value={editData.description}
                         onChange={(e) => setEditData(prev => ({ ...prev, description: e.target.value }))}
-                        className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                        className="w-full px-3 py-2 bg-white/10 border border-gray-200 hover:border-gray-300 transition-all rounded-lg text-gray-600 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                         placeholder="Description (optional)"
                         rows={3}
                     />
@@ -94,7 +95,7 @@ export default function TaskCard({ task, setTaskToDelete }: TaskCardProps): JSX.
                         <select
                             value={editData.status}
                             onChange={(e) => setEditData(prev => ({ ...prev, status: e.target.value as any }))}
-                            className="flex-1 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="flex-1 px-3 py-2 bg-white/10 border border-gray-200 hover:border-gray-300 transition-all rounded-lg text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                             <option value="pending" className="bg-gray-800">Pending</option>
                             <option value="in-progress" className="bg-gray-800">In Progress</option>
@@ -104,7 +105,7 @@ export default function TaskCard({ task, setTaskToDelete }: TaskCardProps): JSX.
                         <select
                             value={editData.priority}
                             onChange={(e) => setEditData(prev => ({ ...prev, priority: e.target.value as any }))}
-                            className="flex-1 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="flex-1 px-3 py-2 bg-white/10 border border-gray-200 hover:border-gray-300 transition-all rounded-lg text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         >
                             <option value="low" className="bg-gray-800">Low</option>
                             <option value="medium" className="bg-gray-800">Medium</option>
@@ -115,13 +116,13 @@ export default function TaskCard({ task, setTaskToDelete }: TaskCardProps): JSX.
                     <div className="flex gap-2">
                         <button
                             onClick={handleSave}
-                            className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200"
+                            className="flex-1 px-4 py-2 bg-green-500/80 text-white rounded-lg hover:bg-green-500 transition-colors duration-200"
                         >
                             Save
                         </button>
                         <button
                             onClick={handleCancel}
-                            className="flex-1 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors duration-200"
+                            className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-500 transition-colors duration-200"
                         >
                             Cancel
                         </button>
@@ -131,7 +132,7 @@ export default function TaskCard({ task, setTaskToDelete }: TaskCardProps): JSX.
                 // View Mode
                 <>
                     <div className="flex items-start justify-between mb-4">
-                        <h3 className="text-lg font-bold text-white flex-1 group-hover:text-blue-300 transition-colors duration-200">
+                        <h3 className="text-lg font-bold text-gray-900 flex-1 group-hover:text-blue-900 transition-colors duration-200">
                             {task.title}
                         </h3>
                         <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
@@ -157,7 +158,7 @@ export default function TaskCard({ task, setTaskToDelete }: TaskCardProps): JSX.
                     </div>
 
                     {task.description && (
-                        <p className="text-gray-300 text-sm mb-6 leading-relaxed">{task.description}</p>
+                        <p className="text-gray-600 text-sm mb-6 leading-relaxed">{task.description}</p>
                     )}
 
                     <div className="flex flex-wrap gap-2 mb-6">
@@ -208,5 +209,9 @@ export default function TaskCard({ task, setTaskToDelete }: TaskCardProps): JSX.
             )}
         </div>
     );
+}
+
+function setTask(updatedTask: Task) {
+    throw new Error("Function not implemented.");
 }
 

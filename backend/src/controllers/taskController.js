@@ -7,7 +7,7 @@ const taskController = {
     getAllTasks: async (req, res) => {
         try {
             let query = {};
-            const { project, status, priority, assignedTo } = req.query;
+            const { project, status, priority, assignedTo, showAll } = req.query;
 
             // Filtros opcionales
             if (project) query.project = project;
@@ -16,7 +16,8 @@ const taskController = {
             if (assignedTo) query.assignedTo = assignedTo;
 
             // Si no es admin, solo mostrar tareas donde el usuario está involucrado
-            if (req.user.role !== 'admin') {
+            // Si es admin y showAll es true, mostrar todas las tareas
+            if (req.user.role !== 'admin' || showAll !== 'true') {
                 query.$or = [
                     { assignedTo: req.user.id },
                     { createdBy: req.user.id }
@@ -52,7 +53,10 @@ const taskController = {
 
             // Verificar que el proyecto existe si se especifica
             if (taskData.project) {
-                const project = await Project.findById(taskData.project);
+                const project = await Project.findById(taskData.project)
+                    .populate('manager', 'name email role')
+                    .populate('assignedUsers.user', 'name email role');
+
                 if (!project) {
                     return res.status(404).json({
                         success: false,
@@ -66,6 +70,21 @@ const taskController = {
                         success: false,
                         message: 'No tienes permisos para crear tareas en este proyecto'
                     });
+                }
+
+                // Validar que el usuario asignado pertenece al proyecto
+                if (taskData.assignedTo && taskData.assignedTo !== req.user.id) {
+                    const isUserInProject = project.manager._id.toString() === taskData.assignedTo ||
+                        project.assignedUsers.some(assignment =>
+                            assignment.user._id.toString() === taskData.assignedTo
+                        );
+
+                    if (!isUserInProject) {
+                        return res.status(400).json({
+                            success: false,
+                            message: 'El usuario asignado debe pertenecer al proyecto'
+                        });
+                    }
                 }
             }
 
@@ -130,7 +149,7 @@ const taskController = {
     // Actualizar tarea
     updateTask: async (req, res) => {
         try {
-            const task = await Task.findById(req.params.id);
+            const task = await Task.findById(req.params.id).populate('project');
 
             if (!task) {
                 return res.status(404).json({
@@ -147,6 +166,28 @@ const taskController = {
                     success: false,
                     message: 'No tienes permisos para actualizar esta tarea'
                 });
+            }
+
+            // Si se está cambiando el usuario asignado y la tarea pertenece a un proyecto
+            if (req.body.assignedTo && task.project) {
+                const project = await Project.findById(task.project._id)
+                    .populate('manager', 'name email role')
+                    .populate('assignedUsers.user', 'name email role');
+
+                if (project) {
+                    // Validar que el nuevo usuario asignado pertenece al proyecto
+                    const isUserInProject = project.manager._id.toString() === req.body.assignedTo ||
+                        project.assignedUsers.some(assignment =>
+                            assignment.user._id.toString() === req.body.assignedTo
+                        );
+
+                    if (!isUserInProject) {
+                        return res.status(400).json({
+                            success: false,
+                            message: 'El usuario asignado debe pertenecer al proyecto'
+                        });
+                    }
+                }
             }
 
             const updatedTask = await Task.findByIdAndUpdate(

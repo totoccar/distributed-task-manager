@@ -16,12 +16,17 @@ import {
     Settings,
     CheckCircle,
     Circle,
-    PlayCircle
+    PlayCircle,
+    Trash2,
+    MoreHorizontal
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { projectService } from '@/services/api';
+import { projectService, taskService, Task, userService } from '@/services/api';
+import CreateTaskModal from '@/app/tasks/components/CreateTaskModal';
+import ConfirmModal from '@/components/ConfirmModal';
+import ProjectConfigModal from '@/components/ProjectConfigModal';
 
-interface Task {
+interface ProjectTask {
     _id: string;
     title: string;
     description: string;
@@ -33,6 +38,7 @@ interface Task {
         name: string;
         email: string;
     };
+    project?: string;
     createdBy: {
         _id: string;
         name: string;
@@ -64,7 +70,7 @@ interface Project {
         };
         role: string;
     }>;
-    tasks: Task[];
+    tasks: ProjectTask[];
     createdAt: string;
     updatedAt: string;
 }
@@ -74,13 +80,28 @@ export default function ProjectDetailPage() {
     const router = useRouter();
     const [project, setProject] = useState<Project | null>(null);
     const [loading, setLoading] = useState(true);
+    const [showCreateTaskModal, setShowCreateTaskModal] = useState(false);
+    const [editingTask, setEditingTask] = useState<ProjectTask | null>(null);
+    const [taskToDelete, setTaskToDelete] = useState<ProjectTask | null>(null);
+    const [showConfigModal, setShowConfigModal] = useState(false);
+    const [availableUsers, setAvailableUsers] = useState<any[]>([]);
     const { user, token } = useAuth();
 
     useEffect(() => {
         if (params.id) {
             fetchProject();
+            fetchAvailableUsers();
         }
     }, [params.id]);
+
+    const fetchAvailableUsers = async () => {
+        try {
+            const users = await userService.getAllUsers();
+            setAvailableUsers(users);
+        } catch (error) {
+            console.error('Error fetching users:', error);
+        }
+    };
 
     const fetchProject = async () => {
         try {
@@ -91,6 +112,141 @@ export default function ProjectDetailPage() {
             router.push('/projects');
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleCreateTask = async (taskData: Partial<Task>) => {
+        try {
+            // Preparar los datos de la tarea para enviar al backend
+            const taskForBackend = {
+                title: taskData.title,
+                description: taskData.description,
+                status: taskData.status,
+                priority: taskData.priority,
+                dueDate: taskData.dueDate,
+                project: params.id as string,
+                assignedTo: taskData.assignedTo || undefined // Solo incluir si se seleccionó un usuario
+            };
+
+            await taskService.createTask(taskForBackend);
+            // Refrescar los datos del proyecto para mostrar la nueva tarea
+            await fetchProject();
+            setShowCreateTaskModal(false);
+        } catch (error) {
+            console.error('Error creating task:', error);
+            throw error; // Permitir que el modal maneje el error
+        }
+    };
+
+    const handleEditTask = async (taskData: Partial<Task>) => {
+        if (!editingTask) return;
+
+        try {
+            const taskForBackend = {
+                title: taskData.title,
+                description: taskData.description,
+                status: taskData.status,
+                priority: taskData.priority,
+                dueDate: taskData.dueDate,
+                assignedTo: taskData.assignedTo || undefined // Solo incluir si se seleccionó un usuario
+            };
+
+            await taskService.updateTask(editingTask._id, taskForBackend);
+            await fetchProject();
+            setEditingTask(null);
+        } catch (error) {
+            console.error('Error updating task:', error);
+            throw error;
+        }
+    };
+
+    const handleDeleteTask = async (taskId: string) => {
+        try {
+            await taskService.deleteTask(taskId);
+            await fetchProject();
+            setTaskToDelete(null);
+        } catch (error) {
+            console.error('Error deleting task:', error);
+            alert('Error al eliminar la tarea');
+        }
+    };
+
+    const convertTaskForModal = (task: ProjectTask): Partial<Task> => {
+        return {
+            _id: task._id,
+            title: task.title,
+            description: task.description,
+            status: task.status,
+            priority: task.priority,
+            dueDate: task.dueDate,
+            assignedTo: task.assignedTo?._id, // Convertir objeto a ID
+            project: task.project,
+            createdAt: task.createdAt,
+            updatedAt: task.createdAt // Usar createdAt como fallback
+        };
+    };
+
+    const confirmDeleteTask = (task: ProjectTask) => {
+        setTaskToDelete(task);
+    };
+
+    const handleUpdateProject = async (updatedData: any) => {
+        try {
+            await projectService.updateProject(params.id as string, updatedData);
+            await fetchProject(); // Refrescar los datos
+            setShowConfigModal(false);
+        } catch (error) {
+            console.error('Error updating project:', error);
+            throw error;
+        }
+    };
+
+    // Obtener usuarios que pertenecen al proyecto (manager + usuarios asignados)
+    const getProjectUsers = () => {
+        if (!project) return [];
+
+        const projectUsers = [];
+
+        // Agregar el manager
+        projectUsers.push({
+            _id: project.manager._id,
+            name: project.manager.name,
+            email: project.manager.email
+        });
+
+        // Agregar usuarios asignados
+        project.assignedUsers.forEach(assignment => {
+            projectUsers.push({
+                _id: assignment.user._id,
+                name: assignment.user.name,
+                email: assignment.user.email
+            });
+        });
+
+        return projectUsers;
+    }; const handleToggleTaskStatus = async (task: ProjectTask) => {
+        let newStatus: 'pending' | 'in-progress' | 'completed';
+
+        switch (task.status) {
+            case 'pending':
+                newStatus = 'in-progress';
+                break;
+            case 'in-progress':
+                newStatus = 'completed';
+                break;
+            case 'completed':
+                newStatus = 'pending';
+                break;
+            default:
+                newStatus = 'pending';
+        }
+
+        try {
+            await taskService.updateTask(task._id, { status: newStatus });
+            await fetchProject();
+        } catch (error) {
+            console.error('Error updating task status:', error);
+            alert('Error al actualizar el estado de la tarea');
         }
     };
 
@@ -176,7 +332,7 @@ export default function ProjectDetailPage() {
                 <div className="flex items-center gap-4 mb-6">
                     <div className="flex items-center gap-4">
                         <button
-                            onClick={() => window.location.href = '/'}
+                            onClick={() => window.location.href = '/projects'}
                             className="flex items-center text-gray-600 hover:text-blue-600 transition-colors duration-200 group"
                         >
                             <svg className="w-5 h-5 mr-2 transform group-hover:-translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -191,16 +347,14 @@ export default function ProjectDetailPage() {
                         <p className="text-slate-600 mt-1">{project.description}</p>
                     </div>
                     {isProjectManager && (
-                        <div className="flex gap-2">
-                            <Button variant="outline" className="border-blue-200 text-blue-700">
-                                <Edit className="h-4 w-4 mr-2" />
-                                Editar
-                            </Button>
-                            <Button variant="outline" className="border-slate-200 text-slate-600">
-                                <Settings className="h-4 w-4 mr-2" />
-                                Configurar
-                            </Button>
-                        </div>
+                        <Button
+                            variant="outline"
+                            className="border-slate-200 text-slate-600"
+                            onClick={() => setShowConfigModal(true)}
+                        >
+                            <Settings className="h-4 w-4 mr-2" />
+                            Configurar
+                        </Button>
                     )}
                 </div>
 
@@ -263,7 +417,7 @@ export default function ProjectDetailPage() {
                                 <div className="flex justify-between items-center">
                                     <CardTitle>Tareas del Proyecto</CardTitle>
                                     <Button
-                                        onClick={() => router.push(`/tasks?project=${project._id}`)}
+                                        onClick={() => setShowCreateTaskModal(true)}
                                         className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white"
                                     >
                                         <Plus className="h-4 w-4 mr-2" />
@@ -277,23 +431,57 @@ export default function ProjectDetailPage() {
                                         {project.tasks.map((task) => (
                                             <div
                                                 key={task._id}
-                                                className="flex items-center gap-4 p-4 bg-white/50 rounded-lg border border-blue-100 hover:shadow-md transition-shadow cursor-pointer"
-                                                onClick={() => router.push(`/tasks/${task._id}`)}
+                                                className="flex items-center gap-4 p-4 bg-white/50 rounded-lg border border-blue-100 hover:shadow-md transition-shadow group"
                                             >
-                                                {getTaskStatusIcon(task.status)}
-                                                <div className="flex-1">
-                                                    <h4 className="font-medium text-slate-800">{task.title}</h4>
+                                                <button
+                                                    onClick={() => handleToggleTaskStatus(task)}
+                                                    className="flex-shrink-0 hover:scale-110 transition-transform"
+                                                >
+                                                    {getTaskStatusIcon(task.status)}
+                                                </button>
+                                                <div className="flex-1 min-w-0">
+                                                    <h4 className="font-medium text-slate-800 truncate">{task.title}</h4>
                                                     <p className="text-sm text-slate-600 truncate">{task.description}</p>
-                                                </div>
-                                                <div className="text-right">
-                                                    <Badge className={getPriorityColor(task.priority)} variant="outline">
-                                                        {task.priority}
-                                                    </Badge>
-                                                    {task.assignedTo && (
+                                                    {task.dueDate && (
                                                         <p className="text-xs text-slate-500 mt-1">
-                                                            {task.assignedTo.name}
+                                                            Vence: {formatDate(task.dueDate)}
                                                         </p>
                                                     )}
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <div className="text-right">
+                                                        <div className="flex gap-1 mb-1">
+                                                            <Badge className={getPriorityColor(task.priority)} variant="outline">
+                                                                {task.priority}
+                                                            </Badge>
+                                                            <Badge className={getStatusColor(task.status)} variant="outline">
+                                                                {task.status}
+                                                            </Badge>
+                                                        </div>
+                                                        {task.assignedTo && (
+                                                            <p className="text-xs text-slate-500">
+                                                                {task.assignedTo.name}
+                                                            </p>
+                                                        )}
+                                                    </div>
+
+                                                    {/* Action Buttons */}
+                                                    <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <button
+                                                            onClick={() => setEditingTask(task)}
+                                                            className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
+                                                            title="Editar tarea"
+                                                        >
+                                                            <Edit className="h-4 w-4" />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => confirmDeleteTask(task)}
+                                                            className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
+                                                            title="Eliminar tarea"
+                                                        >
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </div>
                                         ))}
@@ -310,7 +498,7 @@ export default function ProjectDetailPage() {
                                             Comienza agregando la primera tarea a este proyecto
                                         </p>
                                         <Button
-                                            onClick={() => router.push(`/tasks?project=${project._id}`)}
+                                            onClick={() => setShowCreateTaskModal(true)}
                                             className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white"
                                         >
                                             <Plus className="h-4 w-4 mr-2" />
@@ -398,6 +586,44 @@ export default function ProjectDetailPage() {
                         </Card>
                     </div>
                 </div>
+
+                {/* Create/Edit Task Modal */}
+                {(showCreateTaskModal || editingTask) && (
+                    <CreateTaskModal
+                        isOpen={showCreateTaskModal || !!editingTask}
+                        onClose={() => {
+                            setShowCreateTaskModal(false);
+                            setEditingTask(null);
+                        }}
+                        onSubmit={editingTask ? handleEditTask : handleCreateTask}
+                        initialData={editingTask ? convertTaskForModal(editingTask) : undefined}
+                        title={editingTask ? 'Editar Tarea' : 'Crear Nueva Tarea'}
+                        availableUsers={getProjectUsers()}
+                    />
+                )}
+
+                {/* Delete Task Confirmation Modal */}
+                <ConfirmModal
+                    isOpen={!!taskToDelete}
+                    onClose={() => setTaskToDelete(null)}
+                    onConfirm={() => taskToDelete && handleDeleteTask(taskToDelete._id)}
+                    title="Eliminar Tarea"
+                    message={`¿Estás seguro de que quieres eliminar la tarea "${taskToDelete?.title}"? Esta acción no se puede deshacer.`}
+                    confirmText="Eliminar"
+                    cancelText="Cancelar"
+                    type="danger"
+                />
+
+                {/* Project Configuration Modal */}
+                {showConfigModal && project && (
+                    <ProjectConfigModal
+                        isOpen={showConfigModal}
+                        onClose={() => setShowConfigModal(false)}
+                        project={project}
+                        availableUsers={availableUsers}
+                        onSubmit={handleUpdateProject}
+                    />
+                )}
             </div>
         </div>
     );

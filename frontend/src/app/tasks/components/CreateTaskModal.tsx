@@ -1,26 +1,68 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Task } from '@/services/api';
+
+interface User {
+    _id: string;
+    name: string;
+    email: string;
+}
 
 interface CreateTaskModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSubmit: (taskData: Partial<Task>) => Promise<void>;
+    initialData?: Partial<Task>;
+    title?: string;
+    availableUsers?: User[]; // Usuarios disponibles para asignar
 }
 
-export default function CreateTaskModal({ isOpen, onClose, onSubmit }: CreateTaskModalProps) {
+export default function CreateTaskModal({
+    isOpen,
+    onClose,
+    onSubmit,
+    initialData,
+    title = 'Create New Task',
+    availableUsers = []
+}: CreateTaskModalProps) {
     const [formData, setFormData] = useState<{
         title: string;
         description: string;
         status: "pending" | "in-progress" | "completed";
         priority: "low" | "medium" | "high";
         dueDate: string;
+        assignedTo: string;
     }>({
         title: '',
         description: '',
         status: 'pending',
         priority: 'medium',
-        dueDate: ''
+        dueDate: '',
+        assignedTo: ''
     });
+
+    // Actualizar el formulario cuando se proporcione initialData
+    useEffect(() => {
+        if (initialData) {
+            setFormData({
+                title: initialData.title || '',
+                description: initialData.description || '',
+                status: initialData.status || 'pending',
+                priority: initialData.priority || 'medium',
+                dueDate: initialData.dueDate ? initialData.dueDate.split('T')[0] : '',
+                assignedTo: initialData.assignedTo || ''
+            });
+        } else {
+            // Resetear formulario para nueva tarea
+            setFormData({
+                title: '',
+                description: '',
+                status: 'pending',
+                priority: 'medium',
+                dueDate: '',
+                assignedTo: ''
+            });
+        }
+    }, [initialData, isOpen]);
 
     const handleSubmit = async (e: { preventDefault: () => void; }) => {
         e.preventDefault();
@@ -48,7 +90,7 @@ export default function CreateTaskModal({ isOpen, onClose, onSubmit }: CreateTas
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                             </svg>
                         </div>
-                        <h2 className="text-2xl font-bold text-gray-900">Create New Task</h2>
+                        <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
                     </div>
                     <button
                         onClick={onClose}
@@ -137,6 +179,28 @@ export default function CreateTaskModal({ isOpen, onClose, onSubmit }: CreateTas
                         />
                     </div>
 
+                    {/* Assigned User - Solo mostrar si hay usuarios disponibles */}
+                    {availableUsers.length > 0 && (
+                        <div>
+                            <label className="block text-sm font-bold text-gray-700 mb-2">
+                                Assign To
+                            </label>
+                            <select
+                                name="assignedTo"
+                                value={formData.assignedTo}
+                                onChange={handleChange}
+                                className="w-full text-gray-700 px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                            >
+                                <option value="">👤 Unassigned</option>
+                                {availableUsers.map((user) => (
+                                    <option key={user._id} value={user._id}>
+                                        {user.name} ({user.email})
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
+
                     <div className="flex flex-col sm:flex-row gap-3 pt-6">
                         <button
                             type="button"
@@ -149,7 +213,7 @@ export default function CreateTaskModal({ isOpen, onClose, onSubmit }: CreateTas
                             type="submit"
                             className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl font-medium shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
                         >
-                            Create Task
+                            {initialData ? 'Actualizar Tarea' : 'Crear Tarea'}
                         </button>
                     </div>
                 </form>

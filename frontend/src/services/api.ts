@@ -88,7 +88,7 @@ export const projectService = {
 export const userService = {
     getAllUsers: async () => {
         const response = await api.get('/auth/users');
-        return response.data;
+        return response.data.data || response.data; // Maneja ambos formatos de respuesta
     },
 };
 

@@ -196,11 +196,15 @@ const authController = {
                 });
             }
 
-            const users = await User.find({
-                isActive: true
-            }).select('name email role avatar createdAt');
+            // Los admin pueden ver todos los usuarios, los manager solo usuarios activos
+            const filter = req.user.role === 'admin' ? {} : { isActive: true };
+            
+            const users = await User.find(filter).select('name email role avatar isActive lastLogin createdAt updatedAt');
 
-            res.json(users);
+            res.json({
+                success: true,
+                data: users
+            });
         } catch (error) {
             res.status(500).json({
                 success: false,

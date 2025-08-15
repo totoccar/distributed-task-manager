@@ -7,33 +7,27 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { UserPlus, Loader2, Mail, Lock, User, Shield, Briefcase, Settings } from 'lucide-react';
+import { UserPlus, Loader2, Mail, Lock, User, CheckCircle } from 'lucide-react';
 
 const RegisterPage = () => {
     const [formData, setFormData] = useState({
         name: '',
         email: '',
+        confirmEmail: '',
         password: '',
-        confirmPassword: '',
-        role: 'user'
+        confirmPassword: ''
     });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [googleLoading, setGoogleLoading] = useState(false);
+    const [success, setSuccess] = useState(false);
+    const [registeredEmail, setRegisteredEmail] = useState('');
     const { register } = useAuth();
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData(prev => ({
             ...prev,
             [e.target.name]: e.target.value
-        }));
-    };
-
-    const handleRoleChange = (value: string) => {
-        setFormData(prev => ({
-            ...prev,
-            role: value
         }));
     };
 
@@ -41,24 +35,50 @@ const RegisterPage = () => {
         e.preventDefault();
         setError('');
 
+        if (formData.email !== formData.confirmEmail) {
+            setError('Los emails no coinciden');
+            return;
+        }
+
         if (formData.password !== formData.confirmPassword) {
-            setError('Passwords do not match');
+            setError('Las contraseñas no coinciden');
             return;
         }
 
         if (formData.password.length < 6) {
-            setError('Password must be at least 6 characters');
+            setError('La contraseña debe tener al menos 6 caracteres');
             return;
         }
 
         setLoading(true);
 
         try {
-            await register(formData.name, formData.email, formData.password, formData.role);
+            // Enviar solo name, email y password - el rol se asignará automáticamente como 'user'
+            await register(formData.name, formData.email, formData.password, 'user');
+            // Si el registro es exitoso, mostrar mensaje de verificación
+            setSuccess(true);
+            setRegisteredEmail(formData.email);
         } catch (err: any) {
-            setError(err.message || 'An error occurred during registration');
+            setError(err.message || 'Ocurrió un error durante el registro');
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleGoogleSignUp = async () => {
+        setError('');
+        setGoogleLoading(true);
+
+        try {
+            // Aquí implementarías la lógica de registro con Google
+            // Por ahora solo simularemos el proceso
+            console.log('Iniciando registro con Google...');
+            // Redirigir a Google OAuth o usar Google SDK
+            window.location.href = '/api/auth/google';
+        } catch (err: any) {
+            setError(err.message || 'Error al conectar con Google');
+        } finally {
+            setGoogleLoading(false);
         }
     };
 
@@ -70,181 +90,220 @@ const RegisterPage = () => {
                         <div className="mx-auto mb-4 w-12 h-12 bg-gradient-to-br from-[#5a689c]/20 to-[#727fb4]/20 backdrop-blur rounded-full flex items-center justify-center">
                             <UserPlus className="w-6 h-6 text-[#5a689c]" />
                         </div>
-                        <CardTitle className="text-2xl text-[#425183]">Create Account</CardTitle>
+                        <CardTitle className="text-2xl text-[#425183]">Crear Cuenta</CardTitle>
                         <CardDescription className="text-[#8995cd]">
-                            Join our task management platform
+                            Únete a nuestra plataforma de gestión de tareas
                         </CardDescription>
                     </CardHeader>
 
                     <CardContent>
-                        {error && (
-                            <div className="mb-6 p-4 bg-destructive/20 border border-destructive/50 rounded-lg">
-                                <p className="text-destructive text-sm">{error}</p>
+                        {/* Success Message */}
+                        {success ? (
+                            <div className="text-center space-y-4">
+                                <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+                                    <CheckCircle className="w-8 h-8 text-green-600" />
+                                </div>
+                                <div>
+                                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                                        ¡Cuenta creada exitosamente!
+                                    </h3>
+                                    <p className="text-gray-600 text-sm mb-4">
+                                        Se ha enviado un correo de verificación a <strong>{registeredEmail}</strong>
+                                    </p>
+                                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+                                        <p className="text-yellow-800 text-sm">
+                                            <strong>Importante:</strong> Revisa tu bandeja de entrada y haz clic en el enlace de verificación
+                                            para activar tu cuenta antes de iniciar sesión.
+                                        </p>
+                                    </div>
+                                    <div className="space-y-3">
+                                        <Button
+                                            onClick={() => {
+                                                setSuccess(false);
+                                                setFormData({
+                                                    name: '',
+                                                    email: '',
+                                                    confirmEmail: '',
+                                                    password: '',
+                                                    confirmPassword: ''
+                                                });
+                                            }}
+                                            variant="outline"
+                                            className="w-full"
+                                        >
+                                            Crear otra cuenta
+                                        </Button>
+                                        <Link href="/login">
+                                            <Button className="w-full">
+                                                Ir a iniciar sesión
+                                            </Button>
+                                        </Link>
+                                    </div>
+                                </div>
                             </div>
-                        )}
-
-                        <form onSubmit={handleSubmit} className="space-y-6">
-                            <div className="space-y-2">
-                                <Label htmlFor="name" className="text-gray-700 flex items-center gap-2">
-                                    <User className="w-4 h-4" />
-                                    Full Name
-                                </Label>
-                                <Input
-                                    id="name"
-                                    name="name"
-                                    type="text"
-                                    value={formData.name}
-                                    onChange={handleChange}
-                                    required
-                                    placeholder="Enter your full name"
-                                    className="bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#990100] focus:ring-[#990100]"
-                                />
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label htmlFor="email" className="text-gray-700 flex items-center gap-2">
-                                    <Mail className="w-4 h-4" />
-                                    Email Address
-                                </Label>
-                                <Input
-                                    id="email"
-                                    name="email"
-                                    type="email"
-                                    value={formData.email}
-                                    onChange={handleChange}
-                                    required
-                                    placeholder="Enter your email"
-                                    className="bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#990100] focus:ring-[#990100]"
-                                />
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label className="text-gray-700 flex items-center gap-2">
-                                    <Shield className="w-4 h-4" />
-                                    Role
-                                </Label>
-                                <Select value={formData.role} onValueChange={handleRoleChange}>
-                                    <SelectTrigger className="bg-white border-gray-300 text-gray-900 focus:border-[#990100] focus:ring-[#990100]">
-                                        <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent className="bg-white border-gray-200">
-                                        <SelectItem value="user" className="text-gray-900 focus:bg-[#990100]/10">
-                                            <div className="flex items-center gap-2">
-                                                <User className="w-4 h-4" />
-                                                Developer
-                                            </div>
-                                        </SelectItem>
-                                        <SelectItem value="manager" className="text-gray-900 focus:bg-[#990100]/10">
-                                            <div className="flex items-center gap-2">
-                                                <Briefcase className="w-4 h-4" />
-                                                Manager
-                                            </div>
-                                        </SelectItem>
-                                        <SelectItem value="admin" className="text-gray-900 focus:bg-[#990100]/10">
-                                            <div className="flex items-center gap-2">
-                                                <Settings className="w-4 h-4" />
-                                                Admin
-                                            </div>
-                                        </SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label htmlFor="password" className="text-gray-700 flex items-center gap-2">
-                                    <Lock className="w-4 h-4" />
-                                    Password
-                                </Label>
-                                <Input
-                                    id="password"
-                                    name="password"
-                                    type="password"
-                                    value={formData.password}
-                                    onChange={handleChange}
-                                    required
-                                    placeholder="Enter your password"
-                                    className="bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#990100] focus:ring-[#990100]"
-                                />
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label htmlFor="confirmPassword" className="text-gray-700 flex items-center gap-2">
-                                    <Lock className="w-4 h-4" />
-                                    Confirm Password
-                                </Label>
-                                <Input
-                                    id="confirmPassword"
-                                    name="confirmPassword"
-                                    type="password"
-                                    value={formData.confirmPassword}
-                                    onChange={handleChange}
-                                    required
-                                    placeholder="Confirm your password"
-                                    className="bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#990100] focus:ring-[#990100]"
-                                />
-                            </div>
-
-                            <Button
-                                type="submit"
-                                disabled={loading}
-                                className="w-full"
-                                size="lg"
-                            >
-                                {loading ? (
-                                    <>
-                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                        Creating account...
-                                    </>
-                                ) : (
-                                    <>
-                                        <UserPlus className="mr-2 h-4 w-4" />
-                                        Create Account
-                                    </>
+                        ) : (
+                            <>
+                                {error && (
+                                    <div className="mb-6 p-4 bg-destructive/20 border border-destructive/50 rounded-lg">
+                                        <p className="text-destructive text-sm">{error}</p>
+                                    </div>
                                 )}
-                            </Button>
-                        </form>
 
-                        <div className="mt-6 text-center">
-                            <p className="text-gray-600">
-                                Already have an account?{' '}
-                                <Link
-                                    href="/login"
-                                    className="text-[#990100] hover:text-[#b90504] font-semibold transition-colors duration-200"
-                                >
-                                    Sign in
-                                </Link>
-                            </p>
-                        </div>
 
-                        {/* Role Descriptions */}
-                        <Card className="mt-6 bg-gray-50/50 border-gray-200">
-                            <CardHeader className="pb-3">
-                                <CardTitle className="text-sm text-gray-900">Role Permissions</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-2">
-                                <div className="flex items-center justify-between text-xs">
-                                    <div className="flex items-center gap-2">
-                                        <User className="w-3 h-3 text-[#990100]" />
-                                        <Badge variant="secondary" className="bg-[#dc2626]/10 text-[#dc2626] text-xs border-[#dc2626]/20">Developer</Badge>
+
+                                <form onSubmit={handleSubmit} className="space-y-6">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="name" className="text-gray-700 flex items-center gap-2">
+                                            <User className="w-4 h-4" />
+                                            Nombre Completo
+                                        </Label>
+                                        <Input
+                                            id="name"
+                                            name="name"
+                                            type="text"
+                                            value={formData.name}
+                                            onChange={handleChange}
+                                            required
+                                            placeholder="Ingresa tu nombre completo"
+                                            className="bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#990100] focus:ring-[#990100]"
+                                        />
                                     </div>
-                                    <span className="text-gray-600">View and manage own tasks</span>
-                                </div>
-                                <div className="flex items-center justify-between text-xs">
-                                    <div className="flex items-center gap-2">
-                                        <Briefcase className="w-3 h-3 text-[#990100]" />
-                                        <Badge variant="secondary" className="bg-[#b90504]/10 text-[#b90504] text-xs border-[#b90504]/20">Manager</Badge>
+
+                                    <div className="space-y-2">
+                                        <Label htmlFor="email" className="text-gray-700 flex items-center gap-2">
+                                            <Mail className="w-4 h-4" />
+                                            Correo Electrónico
+                                        </Label>
+                                        <Input
+                                            id="email"
+                                            name="email"
+                                            type="email"
+                                            value={formData.email}
+                                            onChange={handleChange}
+                                            required
+                                            placeholder="Ingresa tu correo electrónico"
+                                            className="bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#990100] focus:ring-[#990100]"
+                                        />
                                     </div>
-                                    <span className="text-gray-600">Assign tasks to team members</span>
-                                </div>
-                                <div className="flex items-center justify-between text-xs">
-                                    <div className="flex items-center gap-2">
-                                        <Settings className="w-3 h-3 text-[#990100]" />
-                                        <Badge variant="secondary" className="bg-[#990100]/10 text-[#990100] text-xs border-[#990100]/20">Admin</Badge>
+
+                                    <div className="space-y-2">
+                                        <Label htmlFor="confirmEmail" className="text-gray-700 flex items-center gap-2">
+                                            <Mail className="w-4 h-4" />
+                                            Confirmar Correo Electrónico
+                                        </Label>
+                                        <Input
+                                            id="confirmEmail"
+                                            name="confirmEmail"
+                                            type="email"
+                                            value={formData.confirmEmail}
+                                            onChange={handleChange}
+                                            required
+                                            placeholder="Confirma tu correo electrónico"
+                                            className="bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#990100] focus:ring-[#990100]"
+                                        />
                                     </div>
-                                    <span className="text-gray-600">Full system access</span>
+
+                                    <div className="space-y-2">
+                                        <Label htmlFor="password" className="text-gray-700 flex items-center gap-2">
+                                            <Lock className="w-4 h-4" />
+                                            Contraseña
+                                        </Label>
+                                        <Input
+                                            id="password"
+                                            name="password"
+                                            type="password"
+                                            value={formData.password}
+                                            onChange={handleChange}
+                                            required
+                                            placeholder="Ingresa tu contraseña"
+                                            className="bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#990100] focus:ring-[#990100]"
+                                        />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <Label htmlFor="confirmPassword" className="text-gray-700 flex items-center gap-2">
+                                            <Lock className="w-4 h-4" />
+                                            Confirmar Contraseña
+                                        </Label>
+                                        <Input
+                                            id="confirmPassword"
+                                            name="confirmPassword"
+                                            type="password"
+                                            value={formData.confirmPassword}
+                                            onChange={handleChange}
+                                            required
+                                            placeholder="Confirma tu contraseña"
+                                            className="bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-[#990100] focus:ring-[#990100]"
+                                        />
+                                    </div>
+
+                                    <Button
+                                        type="submit"
+                                        disabled={loading}
+                                        className="w-full"
+                                        size="lg"
+                                    >
+                                        {loading ? (
+                                            <>
+                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                Creando cuenta...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <UserPlus className="mr-2 h-4 w-4" />
+                                                Crear Cuenta
+                                            </>
+                                        )}
+                                    </Button>
+                                </form>
+
+                                {/* Google Sign Up */}
+                                <div className="mb-6">
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        className="w-full mt-2 border-gray-300 hover:bg-gray-50"
+                                        onClick={handleGoogleSignUp}
+                                        disabled={googleLoading}
+                                    >
+                                        {googleLoading ? (
+                                            <>
+                                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                Conectando con Google...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
+                                                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                                                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                                                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                                                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                                                </svg>
+                                                Registrarse con Google
+                                            </>
+                                        )}
+                                    </Button>
+
+                                    <div className="relative mt-4">
+                                        <div className="absolute inset-0 flex items-center">
+                                            <span className="w-full border-t border-gray-300" />
+                                        </div>
+
+                                    </div>
                                 </div>
-                            </CardContent>
-                        </Card>
+                                <div className="mt-6 text-center">
+                                    <p className="text-gray-600">
+                                        ¿Ya tienes una cuenta?{' '}
+                                        <Link
+                                            href="/login"
+                                            className="text-[#990100] hover:text-[#b90504] font-semibold transition-colors duration-200"
+                                        >
+                                            Iniciar sesión
+                                        </Link>
+                                    </p>
+                                </div>
+                            </>
+                        )}
                     </CardContent>
                 </Card>
             </div>

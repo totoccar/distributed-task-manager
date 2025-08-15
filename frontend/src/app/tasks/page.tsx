@@ -118,37 +118,37 @@ export default function TasksPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100">
             {/* Navigation */}
-            <nav className="bg-white/80 backdrop-blur-sm shadow-lg border-b border-gray-200/50">
+            <nav className="bg-white shadow-sm border-b border-slate-200">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-4">
                             <button
                                 onClick={() => window.location.href = '/'}
-                                className="flex items-center text-gray-600 hover:text-blue-600 transition-colors duration-200 group"
+                                className="flex items-center text-slate-600 hover:text-slate-900 transition-colors duration-200 group"
                             >
                                 <svg className="w-5 h-5 mr-2 transform group-hover:-translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                                 </svg>
-
+                                <span className="text-sm font-medium">Back to Dashboard</span>
                             </button>
-                            <div className="hidden sm:block w-px h-6 bg-gray-300"></div>
+                            <div className="hidden sm:block w-px h-6 bg-slate-300"></div>
                             <div className="flex items-center">
-                                <div className="bg-blue-100 p-2 rounded-lg mr-3">
-                                    <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <div className="bg-slate-100 p-2 rounded-lg mr-3">
+                                    <svg className="w-6 h-6 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                                     </svg>
                                 </div>
                                 <div>
-                                    <h1 className="text-xl font-bold text-gray-900">Tasks</h1>
-                                    <p className="text-sm text-gray-500">Manage your tasks efficiently</p>
+                                    <h1 className="text-xl font-semibold text-slate-900">Tasks</h1>
+                                    <p className="text-sm text-slate-600">Manage your tasks efficiently</p>
                                 </div>
                             </div>
                         </div>
                         <button
                             onClick={() => setShowCreateForm(true)}
-                            className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-6 py-3 rounded-xl font-medium shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 flex items-center space-x-2"
+                            className="bg-slate-900 hover:bg-slate-800 text-white px-6 py-3 rounded-lg font-medium shadow-lg hover:shadow-xl transition-all duration-200 flex items-center space-x-2"
                         >
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />

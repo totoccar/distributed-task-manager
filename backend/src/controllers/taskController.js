@@ -46,26 +46,37 @@ const taskController = {
     // Crear nueva tarea
     createTask: async (req, res) => {
         try {
+            console.log('=== CREATE TASK REQUEST ===');
+            console.log('User:', req.user);
+            console.log('Body:', req.body);
+
             const taskData = {
                 ...req.body,
                 createdBy: req.user.id
             };
 
+            console.log('Task data to save:', taskData);
+
             // Verificar que el proyecto existe si se especifica
             if (taskData.project) {
+                console.log('Checking project:', taskData.project);
                 const project = await Project.findById(taskData.project)
                     .populate('manager', 'name email role')
                     .populate('assignedUsers.user', 'name email role');
 
                 if (!project) {
+                    console.log('Project not found');
                     return res.status(404).json({
                         success: false,
                         message: 'Project not found'
                     });
                 }
 
+                console.log('Project found:', project.name);
+
                 // Verificar permisos para crear tareas en el proyecto
                 if (req.user.role !== 'admin' && !project.isUserAssigned(req.user.id)) {
+                    console.log('User not assigned to project');
                     return res.status(403).json({
                         success: false,
                         message: 'No tienes permisos para crear tareas en este proyecto'
@@ -80,6 +91,7 @@ const taskController = {
                         );
 
                     if (!isUserInProject) {
+                        console.log('Assigned user not in project');
                         return res.status(400).json({
                             success: false,
                             message: 'El usuario asignado debe pertenecer al proyecto'
@@ -89,17 +101,26 @@ const taskController = {
             }
 
             const task = new Task(taskData);
+            console.log('About to save task...');
             await task.save();
+            console.log('Task saved successfully');
 
             await task.populate('assignedTo', 'name email role');
             await task.populate('project', 'name description status');
             await task.populate('createdBy', 'name email');
+
+            console.log('Task populated:', task);
 
             res.status(201).json({
                 success: true,
                 data: task
             });
         } catch (error) {
+            console.error('=== CREATE TASK ERROR ===');
+            console.error('Error:', error);
+            console.error('Error message:', error.message);
+            console.error('Error stack:', error.stack);
+
             res.status(400).json({
                 success: false,
                 message: 'Error creating task',

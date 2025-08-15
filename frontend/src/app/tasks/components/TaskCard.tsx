@@ -8,22 +8,22 @@ interface StatusColorProps {
 const getStatusColor = (status: StatusColorProps['status']): string => {
     switch (status) {
         case 'completed':
-            return 'bg-green-500/20 text-green-300 border-green-500/50';
+            return 'border-emerald-500 text-slate-700';
         case 'in-progress':
-            return 'bg-yellow-500/20 text-yellow-300 border-yellow-500/50';
+            return 'border-blue-500 text-slate-700';
         default:
-            return 'bg-gray-500/20 text-gray-300 border-gray-500/50';
+            return 'border-slate-400 text-slate-700';
     }
 };
 
 const getPriorityColor = (priority: string | undefined) => {
     switch (priority) {
         case 'high':
-            return 'bg-red-500/20 text-red-300 border-red-500/50';
+            return 'border-red-500 text-red-700 bg-red-50';
         case 'medium':
-            return 'bg-orange-500/20 text-orange-300 border-orange-500/50';
+            return 'border-amber-500 text-amber-700 bg-amber-50';
         default:
-            return 'bg-blue-500/20 text-blue-300 border-blue-500/50';
+            return 'border-slate-400 text-slate-700 bg-slate-50';
     }
 };
 
@@ -71,7 +71,7 @@ export default function TaskCard({ task, setTaskToDelete }: TaskCardProps): JSX.
     };
 
     return (
-        <div className="group bg-white/10 backdrop-blur-lg rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 p-6 border border-white/20 hover:border-white/30 transform hover:-translate-y-1">
+        <div className="group bg-white rounded-lg shadow-sm border border-slate-200 hover:shadow-md transition-all duration-300 p-6 hover:border-slate-300 transform hover:-translate-y-1">
             {isEditing ? (
                 // Edit Mode
                 <div className="space-y-4">
@@ -132,13 +132,13 @@ export default function TaskCard({ task, setTaskToDelete }: TaskCardProps): JSX.
                 // View Mode
                 <>
                     <div className="flex items-start justify-between mb-4">
-                        <h3 className="text-lg font-bold text-gray-900 flex-1 group-hover:text-blue-900 transition-colors duration-200">
+                        <h3 className="text-lg font-bold text-slate-900 flex-1 group-hover:text-blue-900 transition-colors duration-200">
                             {task.title}
                         </h3>
                         <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                             <button
                                 onClick={() => setIsEditing(true)}
-                                className="text-gray-400 hover:text-blue-400 p-2 rounded-lg hover:bg-blue-500/20 transition-all duration-200"
+                                className="text-slate-400 hover:text-blue-500 p-2 rounded-lg hover:bg-blue-50 transition-all duration-200"
                                 title="Edit task"
                             >
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -147,7 +147,7 @@ export default function TaskCard({ task, setTaskToDelete }: TaskCardProps): JSX.
                             </button>
                             <button
                                 onClick={() => setTaskToDelete(task)}
-                                className="text-gray-400 hover:text-red-400 p-2 rounded-lg hover:bg-red-500/20 transition-all duration-200"
+                                className="text-slate-400 hover:text-red-500 p-2 rounded-lg hover:bg-red-50 transition-all duration-200"
                                 title="Delete task"
                             >
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -157,8 +157,11 @@ export default function TaskCard({ task, setTaskToDelete }: TaskCardProps): JSX.
                         </div>
                     </div>
 
+                    {/* Separador */}
+                    <div className="border-t border-slate-200 mb-4"></div>
+
                     {task.description && (
-                        <p className="text-gray-600 text-sm mb-6 leading-relaxed">{task.description}</p>
+                        <p className="text-slate-600 text-sm mb-6 leading-relaxed">{task.description}</p>
                     )}
 
                     <div className="flex flex-wrap gap-2 mb-6">
@@ -169,22 +172,26 @@ export default function TaskCard({ task, setTaskToDelete }: TaskCardProps): JSX.
                                 const nextStatus = statuses[(currentIndex + 1) % statuses.length];
                                 handleStatusChange(nextStatus);
                             }}
-                            className={`px-3 py-1 rounded-full text-xs font-semibold border transition-all duration-200 hover:scale-105 ${getStatusColor(task.status)}`}
+                            className={`px-3 py-1 rounded-lg text-xs font-medium border-2 bg-white transition-all duration-200 hover:scale-105 ${getStatusColor(task.status)}`}
                         >
                             {task.status === 'in-progress'
-                                ? 'In Progress'
-                                : task.status
-                                    ? task.status.charAt(0).toUpperCase() + task.status.slice(1)
+                                ? 'In progress'
+                                : task.status === 'completed'
+                                    ? 'Completed'
                                     : 'Pending'}
                         </button>
-                        <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${getPriorityColor(task.priority)}`}>
-                            {task.priority?.toUpperCase() || 'MEDIUM'} PRIORITY
+                        <span className={`px-3 py-1 rounded-lg text-xs font-medium border-2 ${getPriorityColor(task.priority)}`}>
+                            {task.priority === 'high'
+                                ? 'High priority'
+                                : task.priority === 'medium'
+                                    ? 'Medium priority'
+                                    : 'Low priority'}
                         </span>
                     </div>
 
                     <div className="space-y-2 text-xs">
                         {task.dueDate && (
-                            <div className="flex items-center text-gray-400">
+                            <div className="flex items-center text-slate-500">
                                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                 </svg>
@@ -195,7 +202,7 @@ export default function TaskCard({ task, setTaskToDelete }: TaskCardProps): JSX.
                                 })}
                             </div>
                         )}
-                        <div className="flex items-center text-gray-400">
+                        <div className="flex items-center text-slate-500">
                             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>

@@ -198,7 +198,7 @@ const authController = {
 
             // Los admin pueden ver todos los usuarios, los manager solo usuarios activos
             const filter = req.user.role === 'admin' ? {} : { isActive: true };
-            
+
             const users = await User.find(filter).select('name email role avatar isActive lastLogin createdAt updatedAt');
 
             res.json({
@@ -209,6 +209,114 @@ const authController = {
             res.status(500).json({
                 success: false,
                 message: 'Error fetching users',
+                error: error.message
+            });
+        }
+    },
+
+    // PUT /api/auth/users/:id
+    updateUser: async (req, res) => {
+        try {
+            const { id } = req.params;
+            const { name, email, role, isActive } = req.body;
+
+            // Verificar permisos
+            if (req.user.role !== 'admin' && req.user.id !== id) {
+                return res.status(403).json({
+                    success: false,
+                    message: 'No tienes permisos para actualizar este usuario'
+                });
+            }
+
+            // Solo admin puede cambiar rol y estado
+            const updateData = { name, email };
+            if (req.user.role === 'admin') {
+                updateData.role = role;
+                updateData.isActive = isActive;
+            }
+
+            // Verificar si el email ya está en uso por otro usuario
+            if (email) {
+                const existingUser = await User.findOne({ email, _id: { $ne: id } });
+                if (existingUser) {
+                    return res.status(400).json({
+                        success: false,
+                        message: 'Este email ya está en uso'
+                    });
+                }
+            }
+
+            const updatedUser = await User.findByIdAndUpdate(
+                id,
+                updateData,
+                { new: true, select: '-password' }
+            );
+
+            if (!updatedUser) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Usuario no encontrado'
+                });
+            }
+
+            res.json({
+                success: true,
+                message: 'Usuario actualizado exitosamente',
+                data: updatedUser
+            });
+        } catch (error) {
+            console.error('Error updating user:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Error al actualizar usuario',
+                error: error.message
+            });
+        }
+    },
+
+    // DELETE /api/auth/users/:id
+    deleteUser: async (req, res) => {
+        try {
+            const { id } = req.params;
+
+            // Solo admin puede eliminar usuarios
+            if (req.user.role !== 'admin') {
+                return res.status(403).json({
+                    success: false,
+                    message: 'Solo administradores pueden eliminar usuarios'
+                });
+            }
+
+            // No permitir que se eliminen a sí mismos
+            if (req.user.id === id) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'No puedes eliminarte a ti mismo'
+                });
+            }
+
+            const user = await User.findById(id);
+            if (!user) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Usuario no encontrado'
+                });
+            }
+
+            // Nota: En una aplicación real, aquí deberías manejar las referencias
+            // a este usuario en otras colecciones (proyectos, tareas, etc.)
+
+            await User.findByIdAndDelete(id);
+
+            res.json({
+                success: true,
+                message: 'Usuario eliminado exitosamente'
+            });
+        } catch (error) {
+            console.error('Error deleting user:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Error al eliminar usuario',
                 error: error.message
             });
         }

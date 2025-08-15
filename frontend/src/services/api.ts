@@ -90,6 +90,16 @@ export const userService = {
         const response = await api.get('/auth/users');
         return response.data.data || response.data; // Maneja ambos formatos de respuesta
     },
+
+    updateUser: async (id: string, userData: any) => {
+        const response = await api.put(`/auth/users/${id}`, userData);
+        return response.data;
+    },
+
+    deleteUser: async (id: string) => {
+        const response = await api.delete(`/auth/users/${id}`);
+        return response.data;
+    }
 };
 
 // Funciones para dashboard
@@ -108,23 +118,94 @@ export const dashboardService = {
 // Funciones para tareas
 export const taskService = {
     getAllTasks: async (showAll?: boolean): Promise<Task[]> => {
-        const params = showAll ? '?showAll=true' : '';
-        const response = await api.get<ApiResponse<Task[]>>(`/tasks${params}`);
-        return response.data.data;
+        try {
+            const params = showAll ? '?showAll=true' : '';
+            const response = await api.get(`/tasks${params}`);
+            return response.data.data || response.data;
+        } catch (error) {
+            console.error('Error fetching tasks:', error);
+            throw error;
+        }
     },
 
-    createTask: async (taskData: Partial<Task>): Promise<Task> => {
-        const response = await api.post<ApiResponse<Task>>('/tasks', taskData);
-        return response.data.data;
+    createTask: async (taskData: {
+        title: string;
+        description?: string;
+        status?: 'pending' | 'in-progress' | 'completed';
+        priority?: 'low' | 'medium' | 'high';
+        dueDate?: string;
+        assignedTo?: string;
+        project?: string;
+    }): Promise<Task> => {
+        try {
+            // Validaciones del frontend
+            if (!taskData.title || taskData.title.trim().length === 0) {
+                throw new Error('Title is required');
+            }
+
+            if (taskData.title.length > 100) {
+                throw new Error('Title cannot exceed 100 characters');
+            }
+
+            if (taskData.description && taskData.description.length > 500) {
+                throw new Error('Description cannot exceed 500 characters');
+            }
+
+            // Limpiar y preparar los datos
+            const cleanTaskData: any = {
+                title: taskData.title.trim(),
+                description: taskData.description?.trim() || '',
+                status: taskData.status || 'pending',
+                priority: taskData.priority || 'medium'
+            };
+
+            // Solo agregar campos opcionales si tienen valor
+            if (taskData.dueDate && taskData.dueDate.trim() !== '') {
+                cleanTaskData.dueDate = taskData.dueDate;
+            }
+
+            if (taskData.assignedTo && taskData.assignedTo.trim() !== '') {
+                cleanTaskData.assignedTo = taskData.assignedTo;
+            }
+
+            if (taskData.project && taskData.project.trim() !== '') {
+                cleanTaskData.project = taskData.project;
+            }
+
+            console.log('Creating task with cleaned data:', cleanTaskData);
+            const response = await api.post('/tasks', cleanTaskData);
+            console.log('Task created successfully:', response.data);
+            return response.data.data || response.data;
+        } catch (error: any) {
+            console.error('Error creating task:', error);
+            console.error('Error response:', error.response?.data);
+            console.error('Error status:', error.response?.status);
+
+            // Propagar el error con más información
+            if (error.response?.data?.message) {
+                throw new Error(error.response.data.message);
+            }
+            throw error;
+        }
     },
 
     updateTask: async (id: string, taskData: Partial<Task>): Promise<Task> => {
-        const response = await api.put<ApiResponse<Task>>(`/tasks/${id}`, taskData);
-        return response.data.data;
+        try {
+            const response = await api.put(`/tasks/${id}`, taskData);
+            return response.data.data || response.data;
+        } catch (error) {
+            console.error('Error updating task:', error);
+            throw error;
+        }
     },
 
     deleteTask: async (id: string): Promise<void> => {
-        await api.delete(`/tasks/${id}`);
+        try {
+            await api.delete(`/tasks/${id}`);
+        } catch (error) {
+            console.error('Error deleting task:', error);
+            throw error;
+        }
     },
 };
 

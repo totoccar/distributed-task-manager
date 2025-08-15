@@ -7,10 +7,20 @@ interface User {
     email: string;
 }
 
+interface TaskFormData {
+    title: string;
+    description: string;
+    status: "pending" | "in-progress" | "completed";
+    priority: "low" | "medium" | "high";
+    dueDate: string;
+    assignedTo: string;
+    project?: string;
+}
+
 interface CreateTaskModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSubmit: (taskData: Partial<Task>) => Promise<void>;
+    onSubmit: (taskData: TaskFormData) => Promise<void>;
     initialData?: Partial<Task>;
     title?: string;
     availableUsers?: User[]; // Usuarios disponibles para asignar
@@ -24,14 +34,7 @@ export default function CreateTaskModal({
     title = 'Create New Task',
     availableUsers = []
 }: CreateTaskModalProps) {
-    const [formData, setFormData] = useState<{
-        title: string;
-        description: string;
-        status: "pending" | "in-progress" | "completed";
-        priority: "low" | "medium" | "high";
-        dueDate: string;
-        assignedTo: string;
-    }>({
+    const [formData, setFormData] = useState<TaskFormData>({
         title: '',
         description: '',
         status: 'pending',
@@ -49,7 +52,7 @@ export default function CreateTaskModal({
                 status: initialData.status || 'pending',
                 priority: initialData.priority || 'medium',
                 dueDate: initialData.dueDate ? initialData.dueDate.split('T')[0] : '',
-                assignedTo: initialData.assignedTo || ''
+                assignedTo: typeof initialData.assignedTo === 'object' ? initialData.assignedTo?._id || '' : initialData.assignedTo || ''
             });
         } else {
             // Resetear formulario para nueva tarea

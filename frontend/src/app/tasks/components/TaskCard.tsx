@@ -1,4 +1,4 @@
-import { JSX, useState } from "react";
+import { JSX, useState, useEffect } from "react";
 import { Task, taskService } from '@/services/api';
 
 interface StatusColorProps {
@@ -30,10 +30,12 @@ const getPriorityColor = (priority: string | undefined) => {
 interface TaskCardProps {
     task: Task;
     setTaskToDelete: (task: Task | null) => void;
+    onTaskUpdate?: (updatedTask: Task) => void;
 }
 
-export default function TaskCard({ task, setTaskToDelete }: TaskCardProps): JSX.Element {
+export default function TaskCard({ task, setTaskToDelete, onTaskUpdate }: TaskCardProps): JSX.Element {
     const [isEditing, setIsEditing] = useState(false);
+    const [currentTask, setCurrentTask] = useState<Task>(task);
     const [editData, setEditData] = useState({
         title: task.title,
         description: task.description || '',
@@ -41,12 +43,25 @@ export default function TaskCard({ task, setTaskToDelete }: TaskCardProps): JSX.
         priority: task.priority || 'medium'
     });
 
+    // Actualizar cuando cambie la prop task
+    useEffect(() => {
+        setCurrentTask(task);
+        setEditData({
+            title: task.title,
+            description: task.description || '',
+            status: task.status || 'pending',
+            priority: task.priority || 'medium'
+        });
+    }, [task]);
+
     const handleSave = async () => {
         try {
-
-            const updatedTask = await taskService.updateTask(task._id, editData);
-            setTask(updatedTask);
+            const updatedTask = await taskService.updateTask(currentTask._id, editData);
+            setCurrentTask(updatedTask);
             setIsEditing(false);
+            if (onTaskUpdate) {
+                onTaskUpdate(updatedTask);
+            }
         } catch (error) {
             console.error('Error saving task:', error);
         }
@@ -54,10 +69,10 @@ export default function TaskCard({ task, setTaskToDelete }: TaskCardProps): JSX.
 
     const handleCancel = () => {
         setEditData({
-            title: task.title,
-            description: task.description || '',
-            status: task.status || 'pending',
-            priority: task.priority || 'medium'
+            title: currentTask.title,
+            description: currentTask.description || '',
+            status: currentTask.status || 'pending',
+            priority: currentTask.priority || 'medium'
         });
         setIsEditing(false);
     };
@@ -133,7 +148,7 @@ export default function TaskCard({ task, setTaskToDelete }: TaskCardProps): JSX.
                 <>
                     <div className="flex items-start justify-between mb-4">
                         <h3 className="text-lg font-bold text-slate-900 flex-1 group-hover:text-blue-900 transition-colors duration-200">
-                            {task.title}
+                            {currentTask.title}
                         </h3>
                         <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                             <button
@@ -146,7 +161,7 @@ export default function TaskCard({ task, setTaskToDelete }: TaskCardProps): JSX.
                                 </svg>
                             </button>
                             <button
-                                onClick={() => setTaskToDelete(task)}
+                                onClick={() => setTaskToDelete(currentTask)}
                                 className="text-slate-400 hover:text-red-500 p-2 rounded-lg hover:bg-red-50 transition-all duration-200"
                                 title="Delete task"
                             >
@@ -160,65 +175,87 @@ export default function TaskCard({ task, setTaskToDelete }: TaskCardProps): JSX.
                     {/* Separador */}
                     <div className="border-t border-slate-200 mb-4"></div>
 
-                    {task.description && (
-                        <p className="text-slate-600 text-sm mb-6 leading-relaxed">{task.description}</p>
+                    {currentTask.description && (
+                        <p className="text-slate-600 text-sm mb-6 leading-relaxed">{currentTask.description}</p>
                     )}
 
                     <div className="flex flex-wrap gap-2 mb-6">
                         <button
                             onClick={() => {
                                 const statuses = ['pending', 'in-progress', 'completed'];
-                                const currentIndex = statuses.indexOf(task.status || 'pending');
+                                const currentIndex = statuses.indexOf(currentTask.status || 'pending');
                                 const nextStatus = statuses[(currentIndex + 1) % statuses.length];
                                 handleStatusChange(nextStatus);
                             }}
-                            className={`px-3 py-1 rounded-lg text-xs font-medium border-2 bg-white transition-all duration-200 hover:scale-105 ${getStatusColor(task.status)}`}
+                            className={`px-3 py-1 rounded-lg text-xs font-medium border-2 bg-white transition-all duration-200 hover:scale-105 ${getStatusColor(currentTask.status)}`}
                         >
-                            {task.status === 'in-progress'
+                            {currentTask.status === 'in-progress'
                                 ? 'In progress'
-                                : task.status === 'completed'
+                                : currentTask.status === 'completed'
                                     ? 'Completed'
                                     : 'Pending'}
                         </button>
-                        <span className={`px-3 py-1 rounded-lg text-xs font-medium border-2 ${getPriorityColor(task.priority)}`}>
-                            {task.priority === 'high'
+                        <span className={`px-3 py-1 rounded-lg text-xs font-medium border-2 ${getPriorityColor(currentTask.priority)}`}>
+                            {currentTask.priority === 'high'
                                 ? 'High priority'
-                                : task.priority === 'medium'
+                                : currentTask.priority === 'medium'
                                     ? 'Medium priority'
                                     : 'Low priority'}
                         </span>
-                    </div>
+                    </div>                    <div className="space-y-2 text-xs">
+                        {/* Información del usuario asignado */}
+                        {currentTask.assignedTo && (
+                            <div className="flex items-center text-slate-500">
+                                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                                Assigned to: <span className="font-medium text-slate-700 ml-1">{currentTask.assignedTo.name}</span>
+                            </div>
+                        )}
 
-                    <div className="space-y-2 text-xs">
-                        {task.dueDate && (
+                        {/* Información del proyecto */}
+                        {currentTask.project && (
+                            <div className="flex items-center text-slate-500">
+                                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                </svg>
+                                Project: <span className="font-medium text-slate-700 ml-1">{currentTask.project.name}</span>
+                            </div>
+                        )}
+
+                        {/* Información del creador */}
+                        <div className="flex items-center text-slate-500">
+                            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                            </svg>
+                            Created by: <span className="font-medium text-slate-700 ml-1">{currentTask.createdBy.name}</span>
+                        </div>
+
+                        {currentTask.dueDate && (
                             <div className="flex items-center text-slate-500">
                                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                 </svg>
-                                Due: {new Date(task.dueDate).toLocaleDateString('en-US', {
+                                Due: <span className="font-medium text-slate-700 ml-1">{new Date(currentTask.dueDate).toLocaleDateString('en-US', {
                                     month: 'short',
                                     day: 'numeric',
                                     year: 'numeric'
-                                })}
+                                })}</span>
                             </div>
                         )}
                         <div className="flex items-center text-slate-500">
                             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            Created: {new Date(task.createdAt).toLocaleDateString('en-US', {
+                            Created: <span className="font-medium text-slate-700 ml-1">{new Date(currentTask.createdAt).toLocaleDateString('en-US', {
                                 month: 'short',
                                 day: 'numeric'
-                            })}
+                            })}</span>
                         </div>
                     </div>
                 </>
             )}
         </div>
     );
-}
-
-function setTask(updatedTask: Task) {
-    throw new Error("Function not implemented.");
 }
 

@@ -216,19 +216,22 @@ exports.deleteProject = async (req, res) => {
             return res.status(403).json({ message: 'No tienes permisos para eliminar este proyecto' });
         }
 
-        // Verificar si hay tareas asociadas
-        const taskCount = await Task.countDocuments({ project: project._id });
-        if (taskCount > 0) {
-            return res.status(400).json({
-                message: 'No se puede eliminar el proyecto porque tiene tareas asociadas'
-            });
-        }
+        // Eliminar todas las tareas asociadas al proyecto
+        await Task.deleteMany({ project: project._id });
 
+        // Eliminar el proyecto
         await Project.findByIdAndDelete(req.params.id);
-        res.json({ message: 'Proyecto eliminado correctamente' });
+
+        res.json({
+            success: true,
+            message: 'Proyecto y todas sus tareas asociadas han sido eliminados correctamente'
+        });
     } catch (error) {
         console.error('Error deleting project:', error);
-        res.status(500).json({ message: 'Error al eliminar el proyecto' });
+        res.status(500).json({
+            success: false,
+            message: 'Error al eliminar el proyecto'
+        });
     }
 };
 

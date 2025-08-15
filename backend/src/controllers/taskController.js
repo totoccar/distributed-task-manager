@@ -75,7 +75,9 @@ const taskController = {
                 console.log('Project found:', project.name);
 
                 // Verificar permisos para crear tareas en el proyecto
-                if (req.user.role !== 'admin' && !project.isUserAssigned(req.user.id)) {
+                // Admin y Manager pueden crear tareas en cualquier proyecto
+                // Otros usuarios solo pueden crear tareas en proyectos donde están asignados
+                if (req.user.role !== 'admin' && req.user.role !== 'manager' && !project.isUserAssigned(req.user.id)) {
                     console.log('User not assigned to project');
                     return res.status(403).json({
                         success: false,
@@ -145,7 +147,7 @@ const taskController = {
             }
 
             // Verificar permisos
-            if (req.user.role !== 'admin' &&
+            if (req.user.role !== 'admin' && req.user.role !== 'manager' &&
                 task.assignedTo?.toString() !== req.user.id &&
                 task.createdBy?.toString() !== req.user.id) {
                 return res.status(403).json({
@@ -180,7 +182,7 @@ const taskController = {
             }
 
             // Verificar permisos
-            if (req.user.role !== 'admin' &&
+            if (req.user.role !== 'admin' && req.user.role !== 'manager' &&
                 task.assignedTo?.toString() !== req.user.id &&
                 task.createdBy?.toString() !== req.user.id) {
                 return res.status(403).json({
@@ -245,7 +247,7 @@ const taskController = {
             }
 
             // Verificar permisos
-            if (req.user.role !== 'admin' &&
+            if (req.user.role !== 'admin' && req.user.role !== 'manager' &&
                 task.createdBy?.toString() !== req.user.id) {
                 return res.status(403).json({
                     success: false,

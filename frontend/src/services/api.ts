@@ -43,8 +43,23 @@ export interface Task {
     status: 'pending' | 'in-progress' | 'completed';
     priority: 'low' | 'medium' | 'high';
     dueDate?: string;
-    assignedTo?: string;
-    project?: string;
+    assignedTo?: {
+        _id: string;
+        name: string;
+        email: string;
+        role: string;
+    };
+    project?: {
+        _id: string;
+        name: string;
+        description?: string;
+        status: string;
+    };
+    createdBy: {
+        _id: string;
+        name: string;
+        email: string;
+    };
     createdAt: string;
     updatedAt: string;
 }
@@ -80,6 +95,11 @@ export const projectService = {
 
     updateProject: async (id: string, projectData: any) => {
         const response = await api.put(`/projects/${id}`, projectData);
+        return response.data;
+    },
+
+    deleteProject: async (id: string) => {
+        const response = await api.delete(`/projects/${id}`);
         return response.data;
     },
 };

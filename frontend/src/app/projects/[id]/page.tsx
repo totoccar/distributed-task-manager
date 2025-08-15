@@ -24,7 +24,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { projectService, taskService, Task, userService } from '@/services/api';
 import CreateTaskModal from '@/app/tasks/components/CreateTaskModal';
 import ConfirmModal from '@/components/ConfirmModal';
-import ProjectConfigModal from '@/components/ProjectConfigModal';
+import EditProjectModal from '@/components/EditProjectModal';
 
 interface ProjectTask {
     _id: string;
@@ -83,7 +83,7 @@ export default function ProjectDetailPage() {
     const [showCreateTaskModal, setShowCreateTaskModal] = useState(false);
     const [editingTask, setEditingTask] = useState<ProjectTask | null>(null);
     const [taskToDelete, setTaskToDelete] = useState<ProjectTask | null>(null);
-    const [showConfigModal, setShowConfigModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
     const [availableUsers, setAvailableUsers] = useState<any[]>([]);
     const { user, token } = useAuth();
 
@@ -194,9 +194,22 @@ export default function ProjectDetailPage() {
         try {
             await projectService.updateProject(params.id as string, updatedData);
             await fetchProject(); // Refrescar los datos
-            setShowConfigModal(false);
+            setShowEditModal(false);
         } catch (error) {
             console.error('Error updating project:', error);
+            throw error;
+        }
+    };
+
+    const handleDeleteProject = async (projectId: string) => {
+        try {
+            console.log('Attempting to delete project with ID:', projectId);
+            const result = await projectService.deleteProject(projectId);
+            console.log('Delete result:', result);
+            router.push('/projects'); // Redirigir a la lista de proyectos
+        } catch (error) {
+            console.error('Error deleting project:', error);
+            alert('Error al eliminar el proyecto: ' + (error as any)?.response?.data?.message || (error as any)?.message || 'Error desconocido');
             throw error;
         }
     };
@@ -350,7 +363,7 @@ export default function ProjectDetailPage() {
                         <Button
                             variant="outline"
                             className="border-slate-200 text-slate-600"
-                            onClick={() => setShowConfigModal(true)}
+                            onClick={() => setShowEditModal(true)}
                         >
                             <Settings className="h-4 w-4 mr-2" />
                             Configurar
@@ -614,14 +627,15 @@ export default function ProjectDetailPage() {
                     type="danger"
                 />
 
-                {/* Project Configuration Modal */}
-                {showConfigModal && project && (
-                    <ProjectConfigModal
-                        isOpen={showConfigModal}
-                        onClose={() => setShowConfigModal(false)}
+                {/* Edit Project Modal */}
+                {showEditModal && project && (
+                    <EditProjectModal
+                        isOpen={showEditModal}
+                        onClose={() => setShowEditModal(false)}
                         project={project}
                         availableUsers={availableUsers}
                         onSubmit={handleUpdateProject}
+                        onDelete={handleDeleteProject}
                     />
                 )}
             </div>

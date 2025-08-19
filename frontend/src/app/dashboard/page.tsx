@@ -123,43 +123,9 @@ const DashboardPage = () => {
 
     return (
         <ProtectedRoute>
-            <div className="min-h-screen bg-gradient-to-br from-white via-slate-50 to-blue-50">
+            <div className="pt-18 bg-gradient-to-br from-white via-slate-50 to-blue-50">
                 {/* Header */}
-                <div className="bg-white/70 backdrop-blur-xl border-b border-white/40 shadow-sm">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="flex justify-between items-center py-6">
-                            <div className="flex items-center space-x-4">
-                                <h1 className="text-2xl font-bold text-[#425183]">Task Manager</h1>
-                                <Badge className={`text-xs font-medium border ${getRoleBadgeColor(user?.role || 'user')}`}>
-                                    {user?.role?.toUpperCase()}
-                                </Badge>
-                            </div>
 
-                            <div className="flex items-center space-x-4">
-                                <div className="text-right">
-                                    <p className="text-[#425183] font-medium">{user?.name}</p>
-                                    <p className="text-[#8995cd] text-sm">{user?.email}</p>
-                                </div>
-
-                                <div className="w-10 h-10 bg-gradient-to-r from-[#5a689c] to-[#727fb4] rounded-full flex items-center justify-center">
-                                    <span className="text-white font-bold text-lg">
-                                        {user?.name?.charAt(0).toUpperCase()}
-                                    </span>
-                                </div>
-
-                                <Button
-                                    onClick={logout}
-                                    variant="outline"
-                                    size="sm"
-                                    className="border-destructive/50 text-destructive hover:bg-destructive/10"
-                                >
-                                    <LogOut className="w-4 h-4 mr-2" />
-                                    Logout
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
                 {/* Main Content */}
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

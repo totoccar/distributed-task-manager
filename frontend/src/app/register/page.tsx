@@ -85,16 +85,23 @@ const RegisterPage = () => {
 
     const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || process.env.GOOGLE_CLIENT_ID;
     useEffect(() => {
-        if (window.google && clientId) {
-            window.google.accounts.id.initialize({
-                client_id: clientId,
-                callback: handleGoogleResponse,
-            });
-            window.google.accounts.id.renderButton(
-                document.getElementById("g_id_signin"),
-                { theme: "outline", size: "large", text: "signup_with" }
-            );
+        let retryCount = 0;
+        function tryRenderGoogleButton() {
+            if (window.google && clientId) {
+                window.google.accounts.id.initialize({
+                    client_id: clientId,
+                    callback: handleGoogleResponse,
+                });
+                window.google.accounts.id.renderButton(
+                    document.getElementById("g_id_signin"),
+                    { theme: "outline", size: "large", text: "signup_with" }
+                );
+            } else if (retryCount < 10) {
+                retryCount++;
+                setTimeout(tryRenderGoogleButton, 200);
+            }
         }
+        tryRenderGoogleButton();
     }, [clientId]);
 
     const handleGoogleResponse = (response: any) => {

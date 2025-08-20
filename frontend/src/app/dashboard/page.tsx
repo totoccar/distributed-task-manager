@@ -55,16 +55,16 @@ const DashboardPage = () => {
     const roleBasedMenuItems = [
         // Items para todos los usuarios autenticados
         {
-            title: 'My Tasks',
-            description: 'View and manage your assigned tasks',
+            title: 'Mis Tareas',
+            description: 'Ver y gestionar tus tareas asignadas',
             href: '/tasks',
             icon: CheckSquare,
             roles: ['user', 'manager', 'admin'],
             color: 'bg-gradient-to-br from-[#5a689c]/20 to-[#727fb4]/20 hover:from-[#5a689c]/30 hover:to-[#727fb4]/30'
         },
         {
-            title: 'Projects',
-            description: 'Browse all projects',
+            title: 'Proyectos',
+            description: 'Explora todos los proyectos',
             href: '/projects',
             icon: FolderOpen,
             roles: ['user', 'manager', 'admin'],
@@ -72,16 +72,16 @@ const DashboardPage = () => {
         },
         // Items solo para managers y admins
         {
-            title: 'Team Management',
-            description: 'Manage team members and assignments',
+            title: 'Equipo',
+            description: 'Gestiona los miembros y asignaciones del equipo',
             href: '/team',
             icon: Users,
             roles: ['manager', 'admin'],
             color: 'bg-gradient-to-br from-[#8995cd]/20 to-[#a1ace5]/20 hover:from-[#8995cd]/30 hover:to-[#a1ace5]/30'
         },
         {
-            title: 'Analytics',
-            description: 'View performance metrics and reports',
+            title: 'Analíticas',
+            description: 'Ver métricas de rendimiento e informes',
             href: '/analytics',
             icon: BarChart3,
             roles: ['manager', 'admin'],
@@ -89,16 +89,16 @@ const DashboardPage = () => {
         },
         // Items solo para admins
         {
-            title: 'User Management',
-            description: 'Manage users, roles and permissions',
+            title: 'Usuarios',
+            description: 'Gestiona usuarios, roles y permisos',
             href: '/admin/users',
             icon: Settings,
             roles: ['admin'],
             color: 'bg-gradient-to-br from-[#5a689c]/20 to-[#425183]/20 hover:from-[#5a689c]/30 hover:to-[#425183]/30'
         },
         {
-            title: 'System Settings',
-            description: 'Configure system-wide settings',
+            title: 'Configuración',
+            description: 'Configura opciones del sistema',
             href: '/admin/settings',
             icon: Wrench,
             roles: ['admin'],
@@ -124,22 +124,21 @@ const DashboardPage = () => {
     return (
         <ProtectedRoute>
             <div className="pt-18 bg-gradient-to-br from-white via-slate-50 to-blue-50">
-                {/* Header */}
+                {/* Encabezado */}
 
-
-                {/* Main Content */}
+                {/* Contenido principal */}
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                    {/* Welcome Section */}
+                    {/* Sección de bienvenida */}
                     <div className="text-center mb-12">
                         <h2 className="text-4xl font-bold text-[#425183] mb-4">
-                            Welcome back, {user?.name?.split(' ')[0]}!
+                            ¡Bienvenido de nuevo, {user?.name?.split(' ')[0]}!
                         </h2>
                         <p className="text-[#8995cd] text-lg">
-                            What would you like to work on today?
+                            ¿Qué te gustaría hacer hoy?
                         </p>
                     </div>
 
-                    {/* Menu Grid */}
+                    {/* Menú principal */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
                         {availableMenuItems.map((item, index) => {
                             const IconComponent = item.icon;
@@ -165,7 +164,7 @@ const DashboardPage = () => {
                                                 {item.description}
                                             </CardDescription>
                                             <div className="flex items-center text-[#5a689c] group-hover:text-[#727fb4] transition-colors duration-200">
-                                                <span className="text-sm font-medium">Access now</span>
+                                                <span className="text-sm font-medium">Acceder</span>
                                                 <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-200" />
                                             </div>
                                         </CardContent>
@@ -175,7 +174,7 @@ const DashboardPage = () => {
                         })}
                     </div>
 
-                    {/* Quick Stats */}
+                    {/* Estadísticas rápidas */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <Card className="bg-white/70 backdrop-blur-xl border-white/40 shadow-lg">
                             <CardContent className="text-center p-6">
@@ -185,7 +184,7 @@ const DashboardPage = () => {
                                         {loading ? '...' : stats.activeTasks}
                                     </div>
                                 </div>
-                                <div className="text-[#8995cd]">Active Tasks</div>
+                                <div className="text-[#8995cd]">Tareas activas</div>
                             </CardContent>
                         </Card>
 
@@ -197,7 +196,7 @@ const DashboardPage = () => {
                                         {loading ? '...' : stats.completedToday}
                                     </div>
                                 </div>
-                                <div className="text-[#8995cd]">Completed Today</div>
+                                <div className="text-[#8995cd]">Completadas hoy</div>
                             </CardContent>
                         </Card>
 
@@ -209,7 +208,7 @@ const DashboardPage = () => {
                                         {loading ? '...' : stats.totalProjects}
                                     </div>
                                 </div>
-                                <div className="text-[#8995cd]">Projects</div>
+                                <div className="text-[#8995cd]">Proyectos</div>
                             </CardContent>
                         </Card>
                     </div>

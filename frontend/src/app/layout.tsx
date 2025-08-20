@@ -5,6 +5,8 @@ import "./globals.css";
 import { AuthProvider } from "@/contexts/AuthContext";
 import Navbar from "@/components/Navbar";
 import { usePathname } from "next/navigation";
+import Head from "next/head";
+import Script from "next/script";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -23,17 +25,16 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     const pathname = usePathname();
-    const hideNavbar = pathname === "/login" || pathname === "/register";
+    const hideNavbar = pathname === "/login" || pathname === "/register" || pathname === "/";
     return (
-        <html lang="en">
+        <html lang="es">
             <head>
-                <script src="https://accounts.google.com/gsi/client" async defer></script>
+                <Script src="https://accounts.google.com/gsi/client" strategy="beforeInteractive" />
             </head>
             <body
                 className={`${geistSans.variable} ${geistMono.variable} antialiased`}
             >
                 <AuthProvider>
-                    {/* Navbar solo si no es login o register */}
                     {!hideNavbar && <Navbar />}
                     {children}
                 </AuthProvider>

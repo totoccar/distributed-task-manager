@@ -111,7 +111,7 @@ export default function ProjectsPage() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-white via-slate-50 to-blue-50/30 p-6">
-            <div className="max-w-7xl mx-auto">
+            <div className="max-w-7xl mt-16 mx-auto">
                 {/* Header */}
                 <div className="flex justify-between items-center mb-8">
                     <div className="flex items-center gap-4">

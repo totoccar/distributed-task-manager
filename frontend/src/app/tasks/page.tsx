@@ -126,7 +126,7 @@ export default function TasksPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100">
+        <div className="min-h-screen mt-18 bg-gradient-to-br from-slate-50 via-gray-50 to-slate-100">
             {/* Navigation */}
             <nav className="bg-white shadow-sm border-b border-slate-200">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
@@ -148,8 +148,8 @@ export default function TasksPage() {
                                     </svg>
                                 </div>
                                 <div>
-                                    <h1 className="text-xl font-semibold text-slate-900">Tasks</h1>
-                                    <p className="text-sm text-slate-600">Manage your tasks efficiently</p>
+                                    <h1 className="text-xl font-semibold text-slate-900">Tareas</h1>
+                                    <p className="text-sm text-slate-600">Administra tus tareas eficientemente</p>
                                 </div>
                             </div>
                         </div>
@@ -160,7 +160,7 @@ export default function TasksPage() {
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                             </svg>
-                            <span>New Task</span>
+                            <span>Nueva Tarea</span>
                         </button>
                     </div>
                 </div>
@@ -178,7 +178,7 @@ export default function TasksPage() {
                                 </svg>
                             </div>
                             <div className="ml-4">
-                                <p className="text-sm font-medium text-gray-600">Total Tasks</p>
+                                <p className="text-sm font-medium text-gray-600">Tareas Totales</p>
                                 <p className="text-2xl font-bold text-gray-900">{tasks.length}</p>
                             </div>
                         </div>
@@ -191,7 +191,7 @@ export default function TasksPage() {
                                 </svg>
                             </div>
                             <div className="ml-4">
-                                <p className="text-sm font-medium text-gray-600">In Progress</p>
+                                <p className="text-sm font-medium text-gray-600">En progreso</p>
                                 <p className="text-2xl font-bold text-gray-900">{tasks.filter(t => t.status === 'in-progress').length}</p>
                             </div>
                         </div>
@@ -204,7 +204,7 @@ export default function TasksPage() {
                                 </svg>
                             </div>
                             <div className="ml-4">
-                                <p className="text-sm font-medium text-gray-600">Completed</p>
+                                <p className="text-sm font-medium text-gray-600">Completada</p>
                                 <p className="text-2xl font-bold text-gray-900">{tasks.filter(t => t.status === 'completed').length}</p>
                             </div>
                         </div>
@@ -217,7 +217,7 @@ export default function TasksPage() {
                                 </svg>
                             </div>
                             <div className="ml-4">
-                                <p className="text-sm font-medium text-gray-600">High Priority</p>
+                                <p className="text-sm font-medium text-gray-600">Alta Prioridad</p>
                                 <p className="text-2xl font-bold text-gray-900">{tasks.filter(t => t.priority === 'high').length}</p>
                             </div>
                         </div>
@@ -237,7 +237,7 @@ export default function TasksPage() {
                                 </div>
                                 <input
                                     type="text"
-                                    placeholder="Search tasks..."
+                                    placeholder="Buscar tarea..."
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                     className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -250,10 +250,10 @@ export default function TasksPage() {
                                 onChange={(e) => setStatusFilter(e.target.value)}
                                 className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                             >
-                                <option value="all">All Status</option>
-                                <option value="pending">📋 Pending</option>
-                                <option value="in-progress">⚡ In Progress</option>
-                                <option value="completed">✅ Completed</option>
+                                <option value="all">Cualquier estado</option>
+                                <option value="pending">📋 Pendiente</option>
+                                <option value="in-progress">⚡ En Progreso</option>
+                                <option value="completed">✅ Completada</option>
                             </select>
 
                             {/* Priority Filter */}
@@ -262,10 +262,10 @@ export default function TasksPage() {
                                 onChange={(e) => setPriorityFilter(e.target.value)}
                                 className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
                             >
-                                <option value="all">All Priority</option>
-                                <option value="low">🟢 Low Priority</option>
-                                <option value="medium">🟡 Medium Priority</option>
-                                <option value="high">🔴 High Priority</option>
+                                <option value="all">Cualquier prioridad</option>
+                                <option value="low">🟢 Baja Prioridad</option>
+                                <option value="medium">🟡 Media Prioridad</option>
+                                <option value="high">🔴 Alta Prioridad</option>
                             </select>
                         </div>
 
@@ -279,7 +279,7 @@ export default function TasksPage() {
                                         onChange={(e) => setShowAllTasks(e.target.checked)}
                                         className="text-blue-600 focus:ring-blue-500"
                                     />
-                                    <span className="text-sm font-medium text-blue-800">Show All Tasks</span>
+                                    <span className="text-sm font-medium text-blue-800">Mostrar todas las tareas</span>
                                 </label>
                             )}
 
@@ -288,7 +288,7 @@ export default function TasksPage() {
                                 onClick={clearFilters}
                                 className="px-4 py-2 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors duration-200"
                             >
-                                Clear Filters
+                                Limpiar filtros
                             </button>
                         </div>
                     </div>
@@ -330,7 +330,7 @@ export default function TasksPage() {
                         )}
                         {user?.role === 'admin' && showAllTasks && (
                             <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                                Showing All Tasks
+                                Mostrando todas las tareas
                             </span>
                         )}
                     </div>
@@ -359,8 +359,8 @@ export default function TasksPage() {
                             <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-200"></div>
                             <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent absolute top-0 left-0"></div>
                         </div>
-                        <p className="mt-4 text-lg text-gray-600 font-medium">Loading your tasks...</p>
-                        <p className="text-sm text-gray-400">This should only take a moment</p>
+                        <p className="mt-4 text-lg text-gray-600 font-medium">Cargando tus tareas...</p>
+                        <p className="text-sm text-gray-400">Esto debería tomar solo un momento</p>
                     </div>
                 ) : (
                     <>
@@ -373,14 +373,14 @@ export default function TasksPage() {
                                     </svg>
                                 </div>
                                 <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                                    {tasks.length === 0 ? 'No tasks yet' : 'No tasks match your filters'}
+                                    {tasks.length === 0 ? 'No tenes tareas' : 'No hay tareas con estos filtros'}
                                 </h3>
                                 <p className="text-lg text-gray-500 mb-8 max-w-md mx-auto">
                                     {tasks.length === 0
                                         ? (user?.role === 'admin'
-                                            ? 'Start being productive by creating your first task. You\'ve got this!'
-                                            : 'No tasks have been assigned to you yet. Check back later or contact your project manager.')
-                                        : 'Try adjusting your search criteria or clearing the filters to see more results.'
+                                            ? 'Empeza a ser productivo crando tu primera tarea. ¡Tú puedes hacerlo!'
+                                            : 'No se te han asignado tareas aún. Vuelve más tarde o contacta a tu gerente de proyecto.')
+                                        : 'Intenta ajustar tus criterios de búsqueda o limpiar los filtros para ver más resultados.'
                                     }
                                 </p>
                                 {tasks.length === 0 && (
@@ -391,7 +391,7 @@ export default function TasksPage() {
                                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                                         </svg>
-                                        <span>Create your first task</span>
+                                        <span>Crea tu primera tarea</span>
                                     </button>
                                 )}
                                 {filteredTasks.length === 0 && tasks.length > 0 && (

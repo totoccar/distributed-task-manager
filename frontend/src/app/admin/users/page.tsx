@@ -26,6 +26,9 @@ const AdminUsersPage = () => {
     const [editingUser, setEditingUser] = useState<User | null>(null);
     const [deletingUser, setDeletingUser] = useState<User | null>(null);
     const [showCreateModal, setShowCreateModal] = useState(false);
+    const [search, setSearch] = useState("");
+    const [sortBy, setSortBy] = useState<string>("");
+    const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
 
     const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api';
 
@@ -44,6 +47,32 @@ const AdminUsersPage = () => {
         };
         fetchUsers();
     }, []);
+
+    // Filtrar y ordenar usuarios
+    const filteredUsers = users.filter(u => u.name.toLowerCase().includes(search.toLowerCase()));
+    const sortedUsers = [...filteredUsers].sort((a, b) => {
+        if (!sortBy) return 0;
+        let valA, valB;
+        switch (sortBy) {
+            case "role":
+                valA = a.role;
+                valB = b.role;
+                break;
+            case "estado":
+                valA = a.isActive ? 1 : 0;
+                valB = b.isActive ? 1 : 0;
+                break;
+            case "ultimo":
+                valA = a.lastLogin ? new Date(a.lastLogin).getTime() : 0;
+                valB = b.lastLogin ? new Date(b.lastLogin).getTime() : 0;
+                break;
+            default:
+                return 0;
+        }
+        if (valA < valB) return sortOrder === "asc" ? -1 : 1;
+        if (valA > valB) return sortOrder === "asc" ? 1 : -1;
+        return 0;
+    });
 
 
     const toggleUserStatus = async (userId: string, isActive: boolean) => {
@@ -123,25 +152,33 @@ const AdminUsersPage = () => {
     return (
         <ProtectedRoute requiredRoles={['admin']}>
             <div className="pt-20 min-h-screen bg-background text-foreground font-sans">
-                {/* Botón volver para atrás */}
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex items-center gap-4 py-8">
-                        <button
-                            onClick={() => window.history.back()}
-                            className="flex items-center gap-2 px-3 py-2 bg-muted/60 text-card-foreground rounded-lg font-medium hover:bg-muted/80 transition-all"
-                        >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                            </svg>
-                            Volver
-                        </button>
-                        <h1 className="text-2xl font-bold text-card-foreground">Gestión de Usuarios</h1>
-                    </div>
+                {/* Botón volver para atrás solicitado */}
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-4 mt-2">
+                    <button
+                        onClick={() => window.location.href = '/'}
+                        className="flex items-center text-slate-600 hover:text-slate-900 transition-colors duration-200 group"
+                    >
+                        <svg className="w-5 h-5 mr-2 transform group-hover:-translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </button>
+                    <h1 className="text-xl font-bold text-slate-700">Administrar Usuarios</h1>
                 </div>
 
-                {/* Main Content */}
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                {/* Barra de búsqueda */}
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+                    <input
+                        type="text"
+                        value={search}
+                        onChange={e => setSearch(e.target.value)}
+                        placeholder="Buscar por nombre..."
+                        className="w-full py-3 px-6 text-base bg-white border border-slate-200 focus:border-primary focus:ring-primary rounded-full outline-none transition-all placeholder:text-slate-400"
+                        style={{ borderRadius: "100px" }}
+                    />
+                </div>
 
+                {/* Contenido principal */}
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                     {error && (
                         <div className="mb-6 p-4 bg-destructive/20 border border-destructive/50 rounded-lg">
                             <p className="text-destructive">{error}</p>
@@ -158,17 +195,35 @@ const AdminUsersPage = () => {
                                 <table className="w-full">
                                     <thead className="bg-muted/60">
                                         <tr>
-                                            <th className="px-6 py-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                                            <th className="px-6 py-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider cursor-pointer select-none" onClick={() => { }}>
                                                 Usuario
                                             </th>
-                                            <th className="px-6 py-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                                            <th className="px-6 py-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider cursor-pointer select-none" onClick={() => {
+                                                setSortBy("role");
+                                                setSortOrder(sortBy === "role" && sortOrder === "asc" ? "desc" : "asc");
+                                            }}>
                                                 Rol
+                                                {sortBy === "role" && (
+                                                    <span className="ml-1">{sortOrder === "asc" ? "▲" : "▼"}</span>
+                                                )}
                                             </th>
-                                            <th className="px-6 py-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                                            <th className="px-6 py-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider cursor-pointer select-none" onClick={() => {
+                                                setSortBy("estado");
+                                                setSortOrder(sortBy === "estado" && sortOrder === "asc" ? "desc" : "asc");
+                                            }}>
                                                 Estado
+                                                {sortBy === "estado" && (
+                                                    <span className="ml-1">{sortOrder === "asc" ? "▲" : "▼"}</span>
+                                                )}
                                             </th>
-                                            <th className="px-6 py-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                                            <th className="px-6 py-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider cursor-pointer select-none" onClick={() => {
+                                                setSortBy("ultimo");
+                                                setSortOrder(sortBy === "ultimo" && sortOrder === "asc" ? "desc" : "asc");
+                                            }}>
                                                 Último acceso
+                                                {sortBy === "ultimo" && (
+                                                    <span className="ml-1">{sortOrder === "asc" ? "▲" : "▼"}</span>
+                                                )}
                                             </th>
                                             <th className="px-6 py-4 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                                                 Acciones
@@ -176,7 +231,7 @@ const AdminUsersPage = () => {
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-border">
-                                        {users.map((user) => (
+                                        {sortedUsers.map((user) => (
                                             <tr key={user._id} className="hover:bg-muted/40 transition-colors duration-200">
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <div className="flex items-center">
@@ -194,7 +249,7 @@ const AdminUsersPage = () => {
                                                 <td className="px-6 py-4 whitespace-nowrap">
                                                     <span className={`inline-flex items-center justify-center min-w-[90px] max-w-[120px] h-8 px-4 py-1 rounded-full text-xs font-semibold ${getRoleBadgeColor(user.role)}`}
                                                         style={{ fontFamily: 'var(--font-sans)', letterSpacing: '0.02em' }}>
-                                                        {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                                                        {user.role === 'admin' ? 'Administrador' : user.role === 'manager' ? 'Encargado' : 'Usuario'}
                                                     </span>
                                                 </td>
                                                 <td className="px-6 py-4 whitespace-nowrap">
